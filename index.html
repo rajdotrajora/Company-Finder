@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Category Finder</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    background:#f3f3f3;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:1100px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    color:#1565c0;
+    font-size:32px;
+}
+
+.bank-section{
+    margin-bottom:30px;
+}
+
+.bank-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    justify-content:center;
+}
+
+.bank-card{
+    width:140px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.bank-card img{
+    width:100%;
+    height:70px;
+    object-fit:contain;
+    display:block;
+    background:white;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .bank-grid{
+        gap:8px;
+    }
+
+    .bank-card{
+        width:28%;
+        padding:5px;
+        border-radius:8px;
+    }
+
+    .bank-card img{
+        height:38px;
+    }
+}
+
+.upload-box{
+    border:2px dashed #1565c0;
+    padding:25px;
+    border-radius:10px;
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.loading{
+    text-align:center;
+    color:green;
+    margin-bottom:20px;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.search-box{
+    position:relative;
+    margin-bottom:20px;
+}
+
+.search-box input{
+    width:100%;
+    padding:15px;
+    border:1px solid #000000;
+    border-radius:10px;
+    font-size:18px;
+    background:#faf9f9;
+    color:#000;
+}
+
+#downloadBtn{
+    display:none;
+    margin:10px 0;
+    padding:10px 14px;
+    background:#1565c0;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#downloadBtn:hover{
+    background:#0d47a1;
+}
+
+#suggestions{
+    position:absolute;
+    width:100%;
+    background:white;
+    border:1px solid #ddd;
+    border-top:none;
+    max-height:300px;
+    overflow-y:auto;
+    z-index:1000;
+    left:0;
+}
+
+.suggestion-item{
+    padding:12px;
+    cursor:pointer;
+    border-bottom:1px solid #eee;
+    text-align:left;
+}
+
+.suggestion-item:hover{
+    background:#f3f3f3;
+}
+
+.table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    min-width:600px;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:12px;
+    text-align:left;
+    word-break:break-word;
+}
+
+th{
+    background:#1565c0;
+    color:white;
+}
+
+.not-listed{
+    color:red;
+    font-weight:bold;
+}
+
+#resultCount{
+    margin-bottom:15px;
+    color:#1565c0;
+    font-weight:bold;
+    text-align:left;
+}
+
+#excelFile{
+    display:none;
+}
+
+.file-btn{
+    display:inline-block;
+    padding:10px 16px;
+    background:red;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.file-btn:hover{
+    background:darkred;
+}
+
+.file-btn.success{
+    background:green !important;
+}
+
+.file-btn.error{
+    background:#d32f2f !important;
+}
+
+#fileMsg{
+    margin-top:10px;
+    font-weight:bold;
+    color:red;
+    text-align:center;
+}
+
+/* MOBILE FIX */
+@media(max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    .container{
+        padding:15px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    .bank-grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+    }
+
+    .bank-card img{
+        height:60px;
+    }
+
+    .search-box input{
+        font-size:16px;
+        padding:12px;
+    }
+
+    th,td{
+        padding:10px;
+        font-size:14px;
+    }
+
+    #downloadBtn{
+        width:auto;
+        font-size:14px;
+    }
+}
+table{
+    background:white;
+}
+
+/* POPUP */
+
+.popup-btn{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border:none;
+    background:#1565c0;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.popup-btn:hover{
+    background:#0d47a1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Company Category Finder</h1>
+
+<div class="bank-section">
+
+<div class="bank-grid">
+
+<div class="bank-card" onclick="openBankPopup('hdfc')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg"
+    onerror="this.src='logo/HDFC.svg'">
+</div>
+
+
+
+<div class="bank-card" onclick="openBankPopup('icici')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/ICICI_Bank_Logo.svg"
+    onerror="this.src='logo/ICICI.svg'">
+
+</div>
+
+<div class="bank-card" onclick="openBankPopup('axis')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Axis_Bank_logo.svg"
+    onerror="this.src='logo/Axis.svg'">
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('kotak')">
+  <img src="https://upload.wikimedia.org/wikipedia/en/3/39/Kotak_Mahindra_Group_logo.svg"
+    onerror="this.src='logo/KOTAK.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('idfc')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_of_IDFC_First_Bank.svg"
+    onerror="this.src='logo/IDFC.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('tata')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Tata_Capital_Logo-01.jpg"
+    onerror="this.src='logo/TATA.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('birla')">
+  <img src="https://upload.wikimedia.org/wikipedia/en/7/75/Aditya_Birla_Group_Logo.svg"
+    onerror="this.src='logo/Aditya Birla.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('poonawalla')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Poonawalla-Fincorp-Logo.jpg"
+    onerror="this.src='logo/POONAWALLA.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('piramal')">
+  <img src="https://logowik.com/content/uploads/images/piramal7124.jpg"
+    onerror="this.src='logo/Piramal.svg.svg'">
+	
+	</div>
+
+<div class="bank-card" onclick="openBankPopup('incred')">
+  <img src="https://play-lh.googleusercontent.com/Ar2eAxovpaoPdxymnO5YY8NNOnGivJKCeBGh2RWxzTt13A2W2MjxJPnxZuS8eFPxYiaDTJhsiRF52pyc6CIyPg"
+    onerror="this.src='logo/incred.svg.svg'">
+	
+	</div>
+<div class="bank-card" onclick="openBankPopup('bajaj')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Bajaj_Finserv_Logo.svg"
+    onerror="this.src='logo/bajaj.svg'">
+	
+	</div>
+	
+	<div class="bank-card" onclick="openBankPopup('cibil')">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/TU-CIBIL-logo.jpg"
+    onerror="this.src='logo/TU-CIBIL-logo.jpg'">
+	
+	</div>
+</div>
+</div>
+
+<div class="upload-box">
+
+<h3 style="color:#1565c0;">Upload Company List</h3>
+<br>
+
+<label for="excelFile" id="fileBtn" class="file-btn">Choose File</label>
+
+<input type="file" id="excelFile" accept=".xlsx,.xls">
+
+<div id="fileMsg"></div>
+
+<div class="loading" id="loading"></div>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search Company Name..." disabled>
+<div id="suggestions"></div>
+</div>
+
+<div id="resultCount"></div>
+
+<button id="downloadBtn">Download JPG</button>
+
+<div id="tableArea" class="table-wrapper">
+
+<table id="resultTable" style="display:none;">
+<thead>
+<tr>
+<th>Bank</th>
+<th>Company</th>
+<th>Category</th>
+</tr>
+</thead>
+
+<tbody id="resultBody"></tbody>
+
+</table>
+</div>
+
+</div>
+
+</div>
+
+<!-- POPUP -->
+
+<div id="bankPopup" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+z-index:9999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:white;
+padding:20px;
+border-radius:10px;
+width:90%;
+max-width:320px;
+text-align:center;
+">
+
+<h3 style="margin-bottom:15px;color:#1565c0;">
+Select Option
+</h3>
+
+<div id="popupButtons"></div>
+<div id="popupError" style="color:red;font-weight:bold;margin-top:10px;"></div>
+
+<br><br>
+
+<button onclick="closePopup()" style="
+padding:8px 14px;
+border:none;
+background:#d32f2f;
+color:white;
+border-radius:6px;
+cursor:pointer;
+">
+Close
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const buttonLabelsByBank = {
+
+    hdfc: {
+	        login: "Login",
+           repayment: "Repayment",
+        disbursed: "Disburse"
+    },
+
+    icici: {
+	
+	        login: "Login",
+			disbursed: "Track My Loan"
+    },
+
+    axis: {
+        repayment: "Repayment"
+    },
+
+    kotak: {
+        repayment: "Repayment",
+        disbursed: "Disbursed Status",
+        login: "Login"
+    },
+
+    idfc: {
+	        login: "Login",
+             repayment: "Repayment"
+    },
+
+    tata: {
+        repayment: "Repayment"
+    },
+
+    birla: {
+        repayment: "Repayment",
+        disbursed: "Disbursed Status",
+        login: "Login"
+    },
+
+    poonawalla: {
+	        login: "Login"
+
+    },
+
+    piramal: {
+        login: "Login"
+    },
+	
+	
+    incred: {
+        login: "Login"
+    },
+	
+	
+		
+    bajaj: {
+        login: "Login",
+	    repayment: "Repayment"
+
+    },
+	
+		
+    cibil: {
+        cibil: "CIBIL",
+		paisa: "PAISA BAZAR"
+
+    }
+};
+const bankLinks = {
+
+    hdfc:{
+	login:"https://applyonline.hdfc.bank.in/personal-loans?SMCode=m15991&utm_medium=xplembedurl_wbookv1&utm_campaign=xplembedurl_wbookv1&LGCode=40611&SECode=&TSECode=&channelsource=DSA&DSACode=40611&LCCode=&utm_source=DSA_40611",
+    repayment:"https://apply.hdfcbank.com/digital/retail_assets_phase2#DT_HomePage",
+     disbursed:"https://leadinsta.hdfcbank.com/applications/webforms/apply/PADD_DD/CustVerification.aspx"
+    },
+
+    icici:{
+	        login:"https://ilens.icici.bank.in/login/",
+            disbursed:"https://ilens.icici.bank.in/TrackMyLoan/#/"
+    },
+
+    axis:{
+        repayment:"https://application.axis.bank.in/webforms/axis-support/retail_loan_list.aspx"
+    },
+
+
+    incred:{
+        login:"https://pl.incred.com/open-market-sales/login"
+    },
+
+    idfc:{
+	
+	        login:"https://idfcfirstbank-pl.my.site.com/loans/CommunityLogin?refURL=http%3A%2F%2Fidfcfirstbank-pl.my.site.com%2Floans%2FCommunityLogin",
+
+        repayment:"https://my.idfcfirst.bank.in/login"
+    },
+	
+	    bajaj:{
+	
+	        login:"https://partners.bajajfinserv.in/#;",
+
+        repayment:"https://www.bajajfinserv.in/myaccountlogin"
+    },
+	
+	    cibil:{
+	
+	        cibil:"https://www.cibil.com/",
+
+        paisa:"https://www.paisabazaar.com/cibil-credit-report/"
+    },
+
+    tata:{
+        repayment:"https://retailonline.tatacapital.com/#/login",
+    },
+
+
+
+    poonawalla:{
+        login:"https://instant-pocket-loan.poonawallafincorp.com/?redirectto=primepl&utm_DSA_Code=FDL01450&UTM_Par…"    
+		},
+
+    piramal:{
+        login:"https://www.piramalfinance.com/pc/login"
+    }
+};
+
+let currentBank = "";
+
+function openBankPopup(bank){
+
+    currentBank = bank;
+
+    let data = bankLinks[bank] || {};
+    let container = document.getElementById("popupButtons");
+    let error = document.getElementById("popupError");
+
+    container.innerHTML = "";
+    error.innerText = "";
+
+    // collect valid links
+    let validLinks = Object.values(data).filter(v => v && v.trim() !== "");
+
+    // ❌ NO LINK → POPUP NOT OPEN
+    if(validLinks.length === 0){
+        alert("There is no link ❌");
+        return;
+    }
+
+    // show popup only if links exist
+    document.getElementById("bankPopup").style.display = "flex";
+
+    // create buttons dynamically
+    for(let key in data){
+        if(data[key] && data[key].trim() !== ""){
+
+            let btn = document.createElement("button");
+            btn.className = "popup-btn";
+btn.innerText = (buttonLabelsByBank[bank] && buttonLabelsByBank[bank][key])
+    ? buttonLabelsByBank[bank][key]
+    : key.toUpperCase();
+            btn.onclick = () => window.open(data[key], "_blank");
+
+            container.appendChild(btn);
+        }
+    }
+}
+function closePopup(){
+    document.getElementById("bankPopup").style.display = "none";
+}
+
+let allData = [];
+let companyMap = new Map();
+let lastResult = [];
+let excelLoaded = false;
+
+function normalizeCompanyName(name){
+
+    return name.toString()
+    .replace(/[^a-zA-Z0-9 ]/g,' ')
+    .replace(/\bPRIVATE\b/gi,'PVT')
+    .replace(/\bLIMITED\b/gi,'LTD')
+    .replace(/\s+/g,' ')
+    .trim()
+    .toLowerCase();
+}
+
+/* ===== SHOW ERROR IF ALREADY UPLOADED ===== */
+
+document.getElementById("fileBtn").addEventListener("click", function(e){
+
+    if(excelLoaded){
+
+        e.preventDefault();
+
+        let btn = document.getElementById("fileBtn");
+        let msg = document.getElementById("fileMsg");
+
+        msg.innerText = "Excel already uploaded ❌";
+
+        btn.classList.add("error");
+
+        setTimeout(()=>{
+
+            msg.innerText = "";
+            btn.classList.remove("error");
+
+        },2000);
+    }
+});
+
+/* ===== FILE + EXCEL LOAD SAME EVENT ===== */
+
+document.getElementById("excelFile").addEventListener("change", function(e){
+
+    let file = e.target.files[0];
+
+    if(!file) return;
+
+    let btn = document.getElementById("fileBtn");
+    let msg = document.getElementById("fileMsg");
+
+    document.getElementById("loading").innerText =
+    "Loading Excel File...";
+
+    btn.innerText = "Uploading...";
+    btn.classList.remove("success","error");
+
+    let reader = new FileReader();
+
+    reader.onload = function(event){
+
+        let data = new Uint8Array(event.target.result);
+
+        let workbook = XLSX.read(data,{type:'array'});
+
+        allData = [];
+        companyMap.clear();
+
+        workbook.SheetNames.forEach(sheetName => {
+
+            let sheet = workbook.Sheets[sheetName];
+
+            let json = XLSX.utils.sheet_to_json(sheet);
+
+            json.forEach(row => {
+
+                let company = row["COMPANY NAME"];
+                let category = row["Category"];
+
+                if(company && category){
+
+                    let item = {
+
+                        bank: sheetName,
+                        company: company.toString().trim(),
+                        category: category.toString().trim()
+                    };
+
+                    allData.push(item);
+
+                    let key = normalizeCompanyName(item.company);
+
+                    if(!companyMap.has(key)){
+                        companyMap.set(key, []);
+                    }
+
+                    companyMap.get(key).push(item);
+                }
+            });
+        });
+
+        excelLoaded = true;
+
+        btn.classList.add("success");
+        btn.innerText = "Excel Uploaded ✔";
+
+        msg.innerText = "Excel loaded successfully ✔";
+
+        document.getElementById("loading").innerText =
+        "Excel Loaded Successfully ✔";
+
+        setTimeout(()=>{
+
+            msg.innerText = "";
+            document.getElementById("loading").innerText = "";
+
+        },2000);
+
+        document.getElementById("searchInput").disabled = false;
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
+/* ===== SEARCH ===== */
+
+let suggestions = document.getElementById("suggestions");
+let timeout;
+
+document.getElementById("searchInput").addEventListener("input", function(){
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+
+        let search = normalizeCompanyName(this.value);
+
+        suggestions.innerHTML = "";
+
+        if(search.length < 2){
+
+            document.getElementById("resultTable").style.display = "none";
+            document.getElementById("resultCount").innerText = "";
+            document.getElementById("downloadBtn").style.display = "none";
+
+            return;
+        }
+
+        let matches = [];
+
+        for(let [key,val] of companyMap){
+
+            if(key.includes(search)){
+
+                matches.push(val[0].company);
+            }
+
+            if(matches.length >= 10) break;
+        }
+
+        if(matches.length === 0){
+
+            suggestions.innerHTML =
+            `<div class="suggestion-item">No Record Found</div>`;
+
+            return;
+        }
+
+        suggestions.innerHTML = matches.map(c =>
+        `<div class="suggestion-item">${c}</div>`
+        ).join("");
+
+    },100);
+});
+
+/* ===== CLICK RESULT ===== */
+
+suggestions.addEventListener("click", function(e){
+
+    let item = e.target.closest(".suggestion-item");
+
+    if(!item) return;
+
+    let company = item.innerText.trim();
+
+    if(company === "No Record Found") return;
+
+    document.getElementById("searchInput").value = company;
+
+    suggestions.innerHTML = "";
+
+    let key = normalizeCompanyName(company);
+
+    let data = companyMap.get(key) || [];
+
+    let banks = [...new Set(allData.map(x => x.bank))];
+
+    let html = "";
+    let foundBanks = 0;
+
+    lastResult = [];
+
+    banks.forEach(bank => {
+
+        let match = data.find(x => x.bank === bank);
+
+        if(match){
+
+            foundBanks++;
+
+            html += `
+            <tr>
+                <td>${match.bank}</td>
+                <td>${match.company}</td>
+                <td>${match.category}</td>
+            </tr>`;
+
+            lastResult.push(match);
+
+        }else{
+
+            html += `
+            <tr>
+                <td>${bank}</td>
+                <td>${company}</td>
+                <td class="not-listed">NOT LISTED</td>
+            </tr>`;
+        }
+    });
+
+    document.getElementById("resultBody").innerHTML = html;
+
+    document.getElementById("resultCount").innerText =
+    `Found in ${foundBanks} Banks`;
+
+    document.getElementById("resultTable").style.display = "table";
+
+    document.getElementById("downloadBtn").style.display = "inline-block";
+});
+
+/* ===== HIDE SUGGESTION CLICK OUTSIDE ===== */
+
+document.addEventListener("click", function(e){
+
+    if(!e.target.closest(".search-box")){
+
+        suggestions.innerHTML = "";
+    }
+});
+
+
+function openLink(type){
+
+window.open(bankLinks[currentBank][type], "_blank");}
+
+function closePopup(){
+
+    document.getElementById("bankPopup").style.display = "none";
+}
+/* ===== JPG DOWNLOAD ===== */
+
+
+document.getElementById("downloadBtn").addEventListener("click", async function(){
+
+    let area = document.getElementById("tableArea");
+
+    // save old style
+    let oldOverflow = area.style.overflow;
+    let oldWidth = area.style.width;
+
+    // full table show
+    area.style.overflow = "visible";
+    area.style.width = "max-content";
+
+    const canvas = await html2canvas(area, {
+
+        scale: 4, // HIGH QUALITY
+
+        useCORS: true,
+
+        backgroundColor: "#ffffff",
+
+        scrollX: 0,
+
+        scrollY: -window.scrollY,
+
+        windowWidth: document.documentElement.scrollWidth,
+
+        windowHeight: document.documentElement.scrollHeight
+    });
+
+    // restore
+    area.style.overflow = oldOverflow;
+    area.style.width = oldWidth;
+
+    // MOBILE FIX
+    canvas.toBlob(function(blob){
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+
+        a.download = "company-result.jpg";
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+    }, "image/jpeg", 1.0);
+
+});
+
+</script>
+
+</body>
+</html>
