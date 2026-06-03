@@ -395,6 +395,16 @@ table{
 
 <div id="resultCount"></div>
 
+<div id="countdownTimer"
+style="
+display:none;
+margin-top:10px;
+font-weight:bold;
+color:red;
+">
+Result clear in: 60s
+</div>
+
 <button id="downloadBtn">Download JPG</button>
 
 <div id="tableArea" class="table-wrapper">
@@ -627,8 +637,13 @@ function openBankPopup(bank){
 btn.innerText = (buttonLabelsByBank[bank] && buttonLabelsByBank[bank][key])
     ? buttonLabelsByBank[bank][key]
     : key.toUpperCase();
-            btn.onclick = () => window.open(data[key], "_blank");
 
+btn.onclick = () => {
+
+    window.open(data[key], "_blank");
+
+    document.getElementById("bankPopup").style.display = "none";
+};
             container.appendChild(btn);
         }
     }
@@ -765,7 +780,8 @@ document.getElementById("excelFile").addEventListener("change", function(e){
 
 let suggestions = document.getElementById("suggestions");
 let timeout;
-
+let autoClearTimer;
+let countdownInterval;
 document.getElementById("searchInput").addEventListener("input", function(){
 
     clearTimeout(timeout);
@@ -777,6 +793,11 @@ document.getElementById("searchInput").addEventListener("input", function(){
         suggestions.innerHTML = "";
 
         if(search.length < 2){
+		
+		clearTimeout(autoClearTimer);
+clearInterval(countdownInterval);
+
+document.getElementById("countdownTimer").style.display = "none";
 
             document.getElementById("resultTable").style.display = "none";
             document.getElementById("resultCount").innerText = "";
@@ -875,7 +896,50 @@ suggestions.addEventListener("click", function(e){
     document.getElementById("resultTable").style.display = "table";
 
     document.getElementById("downloadBtn").style.display = "inline-block";
+	clearTimeout(autoClearTimer);
+clearInterval(countdownInterval);
+
+let seconds = 60;
+
+document.getElementById("countdownTimer").style.display = "block";
+document.getElementById("countdownTimer").innerText =
+"Result clear in: 60s";
+
+countdownInterval = setInterval(() => {
+
+    seconds--;
+
+    document.getElementById("countdownTimer").innerText =
+    "Result clear in: " + seconds + "s";
+
+    if(seconds <= 0){
+
+        clearInterval(countdownInterval);
+
+    }
+
+}, 1000);
+
+autoClearTimer = setTimeout(() => {
+
+    document.getElementById("searchInput").value = "";
+
+    document.getElementById("resultBody").innerHTML = "";
+
+    document.getElementById("resultTable").style.display = "none";
+
+    document.getElementById("resultCount").innerText = "";
+
+    document.getElementById("downloadBtn").style.display = "none";
+
+    document.getElementById("countdownTimer").style.display = "none";
+
+}, 60000);
+
+    document.getElementById("downloadBtn").style.display =
+    "inline-block";
 });
+
 
 /* ===== HIDE SUGGESTION CLICK OUTSIDE ===== */
 
