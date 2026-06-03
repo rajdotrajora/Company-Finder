@@ -633,12 +633,9 @@ btn.innerText = (buttonLabelsByBank[bank] && buttonLabelsByBank[bank][key])
         }
     }
 }
-btn.onclick = () => {
-
-    window.open(data[key], "_blank");
-
+function closePopup(){
     document.getElementById("bankPopup").style.display = "none";
-};
+}
 
 let allData = [];
 let companyMap = new Map();
@@ -768,7 +765,6 @@ document.getElementById("excelFile").addEventListener("change", function(e){
 
 let suggestions = document.getElementById("suggestions");
 let timeout;
-	let autoClearTimer;
 
 document.getElementById("searchInput").addEventListener("input", function(){
 
@@ -783,24 +779,6 @@ document.getElementById("searchInput").addEventListener("input", function(){
         if(search.length < 2){
 
             document.getElementById("resultTable").style.display = "none";
-
-			clearTimeout(autoClearTimer);
-
-autoClearTimer = setTimeout(function(){
-
-    document.getElementById("searchInput").value = "";
-
-    document.getElementById("resultBody").innerHTML = "";
-
-    document.getElementById("resultTable").style.display = "none";
-
-    document.getElementById("resultCount").innerText = "";
-
-    document.getElementById("downloadBtn").style.display = "none";
-
-    suggestions.innerHTML = "";
-
-}, 60000); // Test ke liye 5 sec
             document.getElementById("resultCount").innerText = "";
             document.getElementById("downloadBtn").style.display = "none";
 
