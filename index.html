@@ -110,7 +110,7 @@ h1{
 }
 
 .search-box input{
-        width:100%;
+    width:100%;
     padding:15px;
     border:2px solid #000000;
     border-radius:10px;
@@ -380,7 +380,7 @@ table{
 <h3 style="color:#1565c0;">Upload Company List</h3>
 <br>
 
-<label for="excelFile" id="fileBtn" class="file-btn">Choose File</label>
+<label for="excelFile" id="fileBtn" class="file-btn">Upload Excel</label>
 
 <input type="file" id="excelFile" accept=".xlsx,.xls">
 
@@ -389,12 +389,59 @@ table{
 <div class="loading" id="loading"></div>
 
 <div class="search-box">
+
+
+
 <input type="text" id="searchInput" placeholder="Search Company Name..." disabled>
 <div id="suggestions"></div>
 </div>
 
 <div id="resultCount"></div>
 
+
+<button id="historyBtn" style="
+padding:4px 8px;
+background:#1565c0;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-bottom:10px;
+">
+History
+</button>
+
+
+<div style="
+width:100%;
+display:flex;
+justify-content:flex-end;
+margin-top:-35px;
+margin-bottom:10px;
+">
+
+<button id="removeExcelBtn"
+style="
+padding:4px 8px;
+background:red;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+">
+Remove Excel
+</button>
+
+</div>
+
+<div id="historyBox" style="
+display:none;
+background:white;
+border:1px solid #ddd;
+border-radius:8px;
+padding:10px;
+margin-bottom:10px;
+"></div>
 <div id="countdownTimer"
 style="
 display:none;
@@ -402,10 +449,12 @@ margin-top:10px;
 font-weight:bold;
 color:red;
 ">
-Result clear in: 60s
+Result clear in: 120s
 </div>
 
 <button id="downloadBtn">Download JPG</button>
+
+
 
 <div id="tableArea" class="table-wrapper">
 
@@ -602,9 +651,11 @@ const bankLinks = {
         login:"https://www.piramalfinance.com/pc/login"
     }
 };
-
 let currentBank = "";
 
+/* =========================
+   POPUP CODE
+========================= */
 function openBankPopup(bank){
 
     currentBank = bank;
@@ -616,27 +667,27 @@ function openBankPopup(bank){
     container.innerHTML = "";
     error.innerText = "";
 
-    // collect valid links
     let validLinks = Object.values(data).filter(v => v && v.trim() !== "");
 
-    // ❌ NO LINK → POPUP NOT OPEN
     if(validLinks.length === 0){
         alert("There is no link ❌");
         return;
     }
 
-    // show popup only if links exist
     document.getElementById("bankPopup").style.display = "flex";
 
-    // create buttons dynamically
     for(let key in data){
+
         if(data[key] && data[key].trim() !== ""){
 
             let btn = document.createElement("button");
+
             btn.className = "popup-btn";
-btn.innerText = (buttonLabelsByBank[bank] && buttonLabelsByBank[bank][key])
-    ? buttonLabelsByBank[bank][key]
-    : key.toUpperCase();
+
+            btn.innerText =
+            (buttonLabelsByBank[bank] && buttonLabelsByBank[bank][key])
+            ? buttonLabelsByBank[bank][key]
+            : key.toUpperCase();
 
 btn.onclick = () => {
 
@@ -648,15 +699,22 @@ btn.onclick = () => {
         }
     }
 }
+
 function closePopup(){
     document.getElementById("bankPopup").style.display = "none";
 }
 
+/* =========================
+   GLOBAL DATA
+========================= */
 let allData = [];
 let companyMap = new Map();
 let lastResult = [];
 let excelLoaded = false;
 
+/* =========================
+   NORMALIZE FUNCTION
+========================= */
 function normalizeCompanyName(name){
 
     return name.toString()
@@ -668,121 +726,344 @@ function normalizeCompanyName(name){
     .toLowerCase();
 }
 
-/* ===== SHOW ERROR IF ALREADY UPLOADED ===== */
+/* =========================
+   INDEXEDDB SETUP
+========================= */
 
-document.getElementById("fileBtn").addEventListener("click", function(e){
+let db;
+
+const DB_NAME = "ExcelDB";
+const STORE_NAME = "files";
+
+function openDB(){
+
+    return new Promise((resolve, reject) => {
+
+        let request = indexedDB.open(DB_NAME, 1);
+
+        request.onupgradeneeded = function(e){
+
+            db = e.target.result;
+
+            if(!db.objectStoreNames.contains(STORE_NAME)){
+
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+
+        request.onsuccess = function(e){
+
+            db = e.target.result;
+            resolve(db);
+        };
+
+        request.onerror = function(err){
+
+            reject(err);
+        };
+    });
+}
+
+/* =========================
+   OPEN DB ON PAGE LOAD
+========================= */
+
+window.addEventListener("load", async function(){
+
+    let btn = document.getElementById("fileBtn");
+
+    await openDB();
+
+    let file = await getExcelFromDB();
+
+    /* ✅ IF EXCEL EXISTS */
+   if(file){
+
+    btn.innerText = "Loading Excel...";
+
+    btn.classList.remove("success");
+
+    document.getElementById("loading").innerText =
+    "Please wait...";
+
+    document.getElementById("searchInput").disabled = true;
+
+    setTimeout(async () => {
+
+        await loadExcelData(file);
+
+        excelLoaded = true;
+
+        btn.innerText = "Excel Uploaded ✔";
+
+        btn.classList.add("success");
+
+        document.getElementById("loading").innerText = "";
+
+        document.getElementById("searchInput").disabled = false;
+
+    }, 30000)
+}
+    /* ✅ IF NO EXCEL */
+    else{
+
+        btn.innerText = "Upload Excel";
+
+        btn.classList.remove("success");
+    }
+});
+
+/* =========================
+   SAVE FILE TO DB
+========================= */
+
+function saveExcelToDB(file){
+
+    return new Promise((resolve, reject) => {
+
+        let tx = db.transaction(STORE_NAME, "readwrite");
+
+        let store = tx.objectStore(STORE_NAME);
+
+        store.put(file, "excelFile");
+
+        tx.oncomplete = () => resolve();
+
+        tx.onerror = err => reject(err);
+    });
+}
+
+/* =========================
+   GET FILE FROM DB
+========================= */
+
+function getExcelFromDB(){
+
+    return new Promise((resolve, reject) => {
+
+        let tx = db.transaction(STORE_NAME, "readonly");
+
+        let store = tx.objectStore(STORE_NAME);
+
+        let req = store.get("excelFile");
+
+        req.onsuccess = () => resolve(req.result);
+
+        req.onerror = err => reject(err);
+    });
+}
+
+/* =========================
+   REMOVE EXCEL
+========================= */
+
+function removeExcelFromDB(){
+
+    let tx = db.transaction(STORE_NAME, "readwrite");
+
+    let store = tx.objectStore(STORE_NAME);
+
+    store.delete("excelFile");
+
+    allData = [];
+    companyMap.clear();
+    excelLoaded = false;
+	document.getElementById("excelFile").value = "";
+
+    document.getElementById("fileBtn").innerText =
+    "Upload Excel";
+
+    document.getElementById("searchInput").value = "";
+
+    document.getElementById("resultBody").innerHTML = "";
+
+    document.getElementById("resultTable").style.display = "none";
+
+    document.getElementById("resultCount").innerText = "";
+
+    document.getElementById("downloadBtn").style.display = "none";
+
+    document.getElementById("fileMsg").innerText =
+    "Excel removed ✔";
+
+    setTimeout(()=>{
+
+        document.getElementById("fileMsg").innerText = "";
+
+    },2000);
+}
+
+/* =========================
+   REMOVE BUTTON EVENT
+========================= */
+
+document.getElementById("removeExcelBtn")
+.addEventListener("click", function(){
+
+    removeExcelFromDB();
+});
+
+/* =========================
+   FILE BUTTON CHECK
+========================= */
+
+document.getElementById("fileBtn")
+.addEventListener("click", function(e){
 
     if(excelLoaded){
 
         e.preventDefault();
 
-        let btn = document.getElementById("fileBtn");
         let msg = document.getElementById("fileMsg");
 
         msg.innerText = "Excel already uploaded ❌";
 
-        btn.classList.add("error");
-
         setTimeout(()=>{
 
             msg.innerText = "";
-            btn.classList.remove("error");
 
         },2000);
     }
 });
 
-/* ===== FILE + EXCEL LOAD SAME EVENT ===== */
+/* =========================
+   LOAD EXCEL DATA FUNCTION
+========================= */
 
-document.getElementById("excelFile").addEventListener("change", function(e){
+     async function loadExcelData(file){
+
+    let reader = new FileReader();
+
+    reader.onload = function(event){
+
+        try{
+
+            let data = new Uint8Array(event.target.result);
+
+            let workbook = XLSX.read(data,{type:'array'});
+
+            allData = [];
+            companyMap.clear();
+
+            workbook.SheetNames.forEach(sheetName => {
+
+                let sheet = workbook.Sheets[sheetName];
+
+                let json = XLSX.utils.sheet_to_json(sheet);
+
+                json.forEach(row => {
+
+                    let company = row["COMPANY NAME"];
+                    let category = row["Category"];
+
+                    if(company && category){
+
+                        let item = {
+
+                            bank: sheetName,
+                            company: company.toString().trim(),
+                            category: category.toString().trim()
+                        };
+
+                        allData.push(item);
+
+                        let key = normalizeCompanyName(item.company);
+
+                        if(!companyMap.has(key)){
+
+                            companyMap.set(key, []);
+                        }
+
+                        companyMap.get(key).push(item);
+                    }
+                });
+            });
+
+            excelLoaded = true;
+
+            document.getElementById("loading").innerText =
+            "Excel Loaded Successfully ✔";
+
+            document.getElementById("searchInput").disabled = false;
+
+            setTimeout(()=>{
+
+                document.getElementById("loading").innerText = "";
+
+            },2000);
+
+        }catch(err){
+
+            console.error(err);
+
+            document.getElementById("loading").innerText =
+            "Excel Load Failed ❌";
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+/* =========================
+   FILE UPLOAD EVENT
+========================= */
+
+document.getElementById("excelFile")
+.addEventListener("change", async function(e){
 
     let file = e.target.files[0];
 
     if(!file) return;
 
     let btn = document.getElementById("fileBtn");
-    let msg = document.getElementById("fileMsg");
 
     document.getElementById("loading").innerText =
     "Loading Excel File...";
 
     btn.innerText = "Uploading...";
+
     btn.classList.remove("success","error");
 
-    let reader = new FileReader();
+    try{
 
-    reader.onload = function(event){
+        if(!db){
 
-        let data = new Uint8Array(event.target.result);
+            await openDB();
+        }
 
-        let workbook = XLSX.read(data,{type:'array'});
+        loadExcelData(file);
 
-        allData = [];
-        companyMap.clear();
-
-        workbook.SheetNames.forEach(sheetName => {
-
-            let sheet = workbook.Sheets[sheetName];
-
-            let json = XLSX.utils.sheet_to_json(sheet);
-
-            json.forEach(row => {
-
-                let company = row["COMPANY NAME"];
-                let category = row["Category"];
-
-                if(company && category){
-
-                    let item = {
-
-                        bank: sheetName,
-                        company: company.toString().trim(),
-                        category: category.toString().trim()
-                    };
-
-                    allData.push(item);
-
-                    let key = normalizeCompanyName(item.company);
-
-                    if(!companyMap.has(key)){
-                        companyMap.set(key, []);
-                    }
-
-                    companyMap.get(key).push(item);
-                }
-            });
-        });
-
-        excelLoaded = true;
+        await saveExcelToDB(file);
 
         btn.classList.add("success");
+
         btn.innerText = "Excel Uploaded ✔";
 
-        msg.innerText = "Excel loaded successfully ✔";
+    }catch(err){
+
+        console.error(err);
+
+        btn.classList.add("error");
+
+        btn.innerText = "Upload Failed";
 
         document.getElementById("loading").innerText =
-        "Excel Loaded Successfully ✔";
-
-        setTimeout(()=>{
-
-            msg.innerText = "";
-            document.getElementById("loading").innerText = "";
-
-        },2000);
-
-        document.getElementById("searchInput").disabled = false;
-    };
-
-    reader.readAsArrayBuffer(file);
+        "Excel Load Failed ❌";
+    }
 });
 
-/* ===== SEARCH ===== */
+/* =========================
+   SEARCH SYSTEM
+========================= */
 
 let suggestions = document.getElementById("suggestions");
+
 let timeout;
 let autoClearTimer;
 let countdownInterval;
-document.getElementById("searchInput").addEventListener("input", function(){
+
+document.getElementById("searchInput")
+.addEventListener("input", function(){
 
     clearTimeout(timeout);
 
@@ -793,15 +1074,21 @@ document.getElementById("searchInput").addEventListener("input", function(){
         suggestions.innerHTML = "";
 
         if(search.length < 2){
-		
 		clearTimeout(autoClearTimer);
 clearInterval(countdownInterval);
 
 document.getElementById("countdownTimer").style.display = "none";
+		
 
-            document.getElementById("resultTable").style.display = "none";
-            document.getElementById("resultCount").innerText = "";
-            document.getElementById("downloadBtn").style.display = "none";
+
+            document.getElementById("resultTable")
+            .style.display = "none";
+
+            document.getElementById("resultCount")
+            .innerText = "";
+
+            document.getElementById("downloadBtn")
+            .style.display = "none";
 
             return;
         }
@@ -821,19 +1108,25 @@ document.getElementById("countdownTimer").style.display = "none";
         if(matches.length === 0){
 
             suggestions.innerHTML =
-            `<div class="suggestion-item">No Record Found</div>`;
+            `<div class="suggestion-item">
+            No Record Found
+            </div>`;
 
             return;
         }
 
         suggestions.innerHTML = matches.map(c =>
+
         `<div class="suggestion-item">${c}</div>`
+
         ).join("");
 
     },100);
 });
 
-/* ===== CLICK RESULT ===== */
+/* =========================
+   CLICK RESULT
+========================= */
 
 suggestions.addEventListener("click", function(e){
 
@@ -842,6 +1135,8 @@ suggestions.addEventListener("click", function(e){
     if(!item) return;
 
     let company = item.innerText.trim();
+	
+	saveToHistory(company);
 
     if(company === "No Record Found") return;
 
@@ -856,6 +1151,7 @@ suggestions.addEventListener("click", function(e){
     let banks = [...new Set(allData.map(x => x.bank))];
 
     let html = "";
+
     let foundBanks = 0;
 
     lastResult = [];
@@ -892,18 +1188,19 @@ suggestions.addEventListener("click", function(e){
 
     document.getElementById("resultCount").innerText =
     `Found in ${foundBanks} Banks`;
+	document.getElementById("downloadBtn").style.display =
+"inline-block";
 
-    document.getElementById("resultTable").style.display = "table";
-
-    document.getElementById("downloadBtn").style.display = "inline-block";
-	clearTimeout(autoClearTimer);
+    document.getElementById("resultTable").style.display =
+    "table";
+clearTimeout(autoClearTimer);
 clearInterval(countdownInterval);
 
-let seconds = 60;
+let seconds = 120;
 
 document.getElementById("countdownTimer").style.display = "block";
 document.getElementById("countdownTimer").innerText =
-"Result clear in: 60s";
+"Result clear in: 120s";
 
 countdownInterval = setInterval(() => {
 
@@ -934,14 +1231,122 @@ autoClearTimer = setTimeout(() => {
 
     document.getElementById("countdownTimer").style.display = "none";
 
-}, 60000);
-
-    document.getElementById("downloadBtn").style.display =
-    "inline-block";
+}, 120000);
 });
 
 
-/* ===== HIDE SUGGESTION CLICK OUTSIDE ===== */
+
+
+/* =========================
+   HISTORY SYSTEM
+========================= */
+
+let searchHistory =
+JSON.parse(localStorage.getItem("companyHistory")) || [];
+
+function saveToHistory(company){
+
+    company = company.trim();
+
+    // Duplicate remove
+    searchHistory = searchHistory.filter(
+        item => item.toLowerCase() !== company.toLowerCase()
+    );
+
+    // New company top par
+    searchHistory.unshift(company);
+
+    // Sirf latest 3
+searchHistory = searchHistory.slice(0,10);
+    localStorage.setItem(
+        "companyHistory",
+        JSON.stringify(searchHistory)
+    );
+}
+
+function renderHistory(){
+
+    let box = document.getElementById("historyBox");
+
+    if(searchHistory.length === 0){
+
+        box.innerHTML = "<p>No History</p>";
+        return;
+    }
+
+    box.innerHTML = "";
+
+    searchHistory.forEach(company => {
+
+        let div = document.createElement("div");
+
+        div.className = "suggestion-item";
+
+        div.innerText = company;
+
+    div.onclick = function(){
+	
+	
+	if(!excelLoaded){
+
+    alert("Excel not loaded. Please wait while Excel loads.");
+
+    return;
+}
+
+    document.getElementById("searchInput").value = company;
+
+    suggestions.innerHTML =
+    `<div class="suggestion-item">${company}</div>`;
+
+    suggestions.querySelector(".suggestion-item").click();
+
+    box.style.display = "none";
+};
+
+        box.appendChild(div);
+    });
+}
+
+document.getElementById("historyBtn")
+.addEventListener("click", function(){
+
+
+if(!excelLoaded){
+
+    alert("Excel not loaded. Please wait while Excel loads.");
+
+    return;
+}
+
+    let box = document.getElementById("historyBox");
+
+    if(box.style.display === "none"){
+
+        renderHistory();
+
+        box.style.display = "block";
+		
+		
+		
+		setTimeout(() => {
+
+    box.style.display = "none";
+
+}, 5000);
+    }
+    else{
+
+        box.style.display = "none";
+    }
+});
+
+
+
+
+/* =========================
+   OUTSIDE CLICK HIDE
+========================= */
 
 document.addEventListener("click", function(e){
 
@@ -951,52 +1356,44 @@ document.addEventListener("click", function(e){
     }
 });
 
+/* =========================
+   LINK OPEN
+========================= */
 
 function openLink(type){
 
-window.open(bankLinks[currentBank][type], "_blank");}
-
-function closePopup(){
-
-    document.getElementById("bankPopup").style.display = "none";
+    window.open(bankLinks[currentBank][type], "_blank");
 }
-/* ===== JPG DOWNLOAD ===== */
 
+/* =========================
+   JPG DOWNLOAD
+========================= */
 
-document.getElementById("downloadBtn").addEventListener("click", async function(){
+document.getElementById("downloadBtn")
+.addEventListener("click", async function(){
 
     let area = document.getElementById("tableArea");
 
-    // save old style
     let oldOverflow = area.style.overflow;
     let oldWidth = area.style.width;
 
-    // full table show
     area.style.overflow = "visible";
     area.style.width = "max-content";
 
     const canvas = await html2canvas(area, {
 
-        scale: 4, // HIGH QUALITY
-
+        scale: 4,
         useCORS: true,
-
         backgroundColor: "#ffffff",
-
         scrollX: 0,
-
         scrollY: -window.scrollY,
-
         windowWidth: document.documentElement.scrollWidth,
-
         windowHeight: document.documentElement.scrollHeight
     });
 
-    // restore
     area.style.overflow = oldOverflow;
     area.style.width = oldWidth;
 
-    // MOBILE FIX
     canvas.toBlob(function(blob){
 
         const url = URL.createObjectURL(blob);
@@ -1016,9 +1413,7 @@ document.getElementById("downloadBtn").addEventListener("click", async function(
         URL.revokeObjectURL(url);
 
     }, "image/jpeg", 1.0);
-
 });
-
 </script>
 
 </body>
