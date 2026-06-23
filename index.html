@@ -23,7 +23,7 @@ body{
 }
 
 .container{
-    width:100%;
+    width:80%;
     max-width:1100px;
     margin:auto;
     background:white;
@@ -44,48 +44,50 @@ h1{
 }
 
 .bank-grid{
-    display:flex;
-    flex-wrap:wrap;
-    gap:20px;
-    justify-content:center;
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:15px;
+    max-width:900px;
+    margin:auto;
 }
-
 .bank-card{
-    width:140px;
-    background:white;
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:10px;
-    text-align:center;
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    width:100%;
+    aspect-ratio:1.4/1;
+    height:auto;
+    background:#fff;
+    border-radius:14px;
     overflow:hidden;
-    cursor:pointer;
 }
 
 .bank-card img{
     width:100%;
-    height:70px;
+    height:100%;
     object-fit:contain;
-    display:block;
-    background:white;
+    padding:10px;
 }
 
-/* MOBILE */
 @media(max-width:768px){
 
     .bank-grid{
-        gap:8px;
+        grid-template-columns:repeat(6,1fr);
+        gap:6px;
     }
 
     .bank-card{
-        width:28%;
-        padding:5px;
         border-radius:8px;
     }
 
     .bank-card img{
-        height:38px;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        padding:4px;
     }
+	
+	
+#historyBtn{
+    margin-right:10px;
+}
 }
 
 .upload-box{
@@ -196,8 +198,7 @@ th{
 #excelFile{
     display:none;
 }
-
-.file-btn{
+.file-btn {
     display:inline-block;
     padding:10px 16px;
     background:red;
@@ -206,6 +207,18 @@ th{
     cursor:pointer;
     font-weight:bold;
     transition:0.3s;
+}
+
+.file-btn.uploading {
+    background:#1565c0 !important;
+}
+
+.file-btn.success {
+    background:green !important;
+}
+
+.file-btn.error {
+    background:#d32f2f !important;
 }
 
 .file-btn:hover{
@@ -288,46 +301,411 @@ table{
 .popup-btn:hover{
     background:#0d47a1;
 }
+
 .container{
     position:relative;
-}
-	.rr-logo{
-    position:absolute;
-    top:2px;
-    left:15px;
-    width:100px;
-    height:auto;
+    padding-top:40px;
 }
 
-@media(max-width:768px){
 
-    .container{
-        padding-top:35px;
-    }
 
-    .rr-logo{
-        position:absolute;
-        top:10px;
-        left:15px;
-        width:85px;
-        height:auto;
-    }
 
-    #historyBtn{
-        margin-right:10px;
-    }
+
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e293b)!important;
+min-height:100vh;
+}
+.container{
+max-width:1200px!important;
+background:rgba(255,255,255,.08)!important;
+backdrop-filter:blur(15px);
+border:1px solid rgba(255,255,255,.12);
+border-radius:24px!important;
+box-shadow:0 20px 50px rgba(0,0,0,.35)!important;
+}
+h1{
+color:#fff!important;
+text-shadow:0 0 20px #2563eb;
+}
+.bank-card{
+background:rgba(255,255,255,.08)!important;
+border-radius:18px!important;
+transition:.3s;
+}
+.bank-card:hover{
+transform:translateY(-8px);
+box-shadow:0 0 25px rgba(37,99,235,.6);
+}
+.search-box input{
+background:rgba(255,255,255,.12)!important;
+color:#fff!important;
+border:2px solid #2563eb!important;
+border-radius:50px!important;
+}
+.upload-box{
+background:rgba(255,255,255,.05)!important;
+border:2px dashed #3b82f6!important;
+}
+.file-btn,#downloadBtn,#historyBtn,#removeExcelBtn{
+background:linear-gradient(135deg,#2563eb,#06b6d4)!important;
+}
+table,td{
+background:rgba(255,255,255,.06)!important;
+color:white!important;
+}
+th{
+background:#2563eb!important;
+}
+
+
+/* ===== RAJ AI PREMIUM OVERRIDE ===== */
+#suggestions:empty{display:none!important;}
+
+body{
+background:linear-gradient(135deg,#0b1220,#172554,#1e3a8a)!important;
+min-height:100vh;
+}
+
+.container{
+max-width:1200px!important;
+background:rgba(15,23,42,.92)!important;
+border:1px solid rgba(255,255,255,.10)!important;
+border-radius:24px!important;
+box-shadow:0 20px 50px rgba(0,0,0,.35)!important;
+backdrop-filter:none!important;
+}
+
+h1{
+text-align:center;
+margin-bottom:25px;
+font-size:32px;
+font-weight:800;
+
+background:linear-gradient(
+90deg,
+#60a5fa,
+#ffffff,
+#60a5fa
+);
+
+background-size:200% auto;
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+animation:titleGlow 4s linear infinite;
+}
+
+h1::after{
+content:"";
+display:block;
+width:180px;
+height:3px;
+margin:10px auto 0;
+
+background:linear-gradient(
+90deg,
+transparent,
+#60a5fa,
+transparent
+);
+
+animation:lineMove 2s infinite;
+}
+
+@keyframes titleGlow{
+0%{background-position:0% center;}
+100%{background-position:200% center;}
+}
+
+@keyframes lineMove{
+0%{
+opacity:.3;
+transform:scaleX(.6);
+}
+50%{
+opacity:1;
+transform:scaleX(1);
+}
+100%{
+opacity:.3;
+transform:scaleX(.6);
+}
+}
+.bank-card{
+background:#fff!important;
+border:1px solid #e5e7eb!important;
+border-radius:14px!important;
+transition:.25s;
+}
+
+.bank-card:hover{
+transform:translateY(-4px);
+}
+
+.bank-card img{
+width:100%!important;
+height:100%!important;
+object-fit:contain!important;
+background:#fff!important;
+}
+
+.search-box input{
+background:#fff3e0!important;
+color:#000!important;
+border:2px solid #2563eb!important;
+outline:none!important;
+box-shadow:none!important;
+}
+
+.upload-box{
+background:rgba(255,255,255,.04)!important;
+border:2px dashed #3b82f6!important;
+}
+
+table,td{
+background:#fff!important;
+color:#000!important;
+}
+
+th{
+background:#2563eb!important;
+color:#fff!important;
+}
+
+.not-listed{
+color:red!important;
+font-weight:bold!important;
+}
+
+#fileBtn:hover,
+#historyBtn:hover,
+#removeExcelBtn:hover,
+#downloadBtn:hover{
+transform:translateY(-4px) scale(1.03);
+box-shadow:0 10px 25px rgba(37,99,235,.4);
+}
+.rr-footer-logo{
+height:60px;
+max-width:155px;
+
+filter:
+drop-shadow(0 0 10px rgba(37,99,235,.7));
+
+animation:
+rrFloat 3s ease-in-out infinite,
+rrGlow 2s ease-in-out infinite alternate;
+}
+
+.rr-footer-logo:hover{
+transform:scale(1.08);
+}
+
+@keyframes rrFloat{
+
+0%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-6px);
+}
+
+100%{
+transform:translateY(0);
+}
 
 }
+
+@keyframes rrGlow{
+
+from{
+filter:
+drop-shadow(0 0 8px rgba(37,99,235,.6));
+}
+
+to{
+filter:
+drop-shadow(0 0 15px rgba(37,99,235,.9))
+drop-shadow(0 0 25px rgba(139,92,246,.7));
+}
+
+}
+
+
+
+#chatBotBtn{
+position:fixed;
+right:20px;
+bottom:20px;
+width:65px;
+height:65px;
+border-radius:50%;
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+cursor:pointer;
+z-index:99999;
+box-shadow:0 0 20px rgba(37,99,235,.7);
+animation:botFloat 2s infinite ease-in-out;
+}
+
+@keyframes botFloat{
+0%{transform:translateY(0);}
+50%{transform:translateY(-8px);}
+100%{transform:translateY(0);}
+}
+
+#chatBox{
+display:none;
+position:fixed;
+right:20px;
+bottom:95px;
+width:320px;
+height:420px;
+background:#0f172a;
+border:1px solid #2563eb;
+border-radius:15px;
+overflow:hidden;
+z-index:99999;
+flex-direction:column;
+box-shadow:0 0 25px rgba(37,99,235,.5);
+}
+
+#chatHeader{
+padding:12px;
+background:#2563eb;
+color:white;
+font-weight:bold;
+text-align:center;
+}
+
+#chatMessages{
+flex:1;
+padding:10px;
+overflow-y:auto;
+color:white;
+font-size:14px;
+}
+
+#chatFooter{
+display:flex;
+padding:10px;
+gap:5px;
+}
+
+#chatInput{
+flex:1;
+padding:8px;
+border:none;
+border-radius:8px;
+outline:none;
+}
+
+#sendBtn{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+
+
+.chat-option{
+width:100%;
+padding:10px;
+margin:5px 0;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+font-weight:bold;
+}
+
+
+
+#chatHeader{
+padding:12px;
+background:#2563eb;
+color:white;
+font-weight:bold;
+text-align:center;
+position:relative;
+}
+
+#chatClose{
+position:absolute;
+right:12px;
+top:10px;
+cursor:pointer;
+font-size:16px;
+}
+
+
+
+#chatBotBtn{
+    position:fixed;
+    right:20px;
+    bottom:25px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#06b6d4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 0 20px rgba(37,99,235,.7);
+    z-index:9999;
+    animation:botFloat 2s ease-in-out infinite;
+}
+
+#chatBotLabel{
+    position:fixed;
+    right:15px;
+    bottom:0px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+    letter-spacing:1px;
+    text-shadow:0 0 10px rgba(37,99,235,.8);
+    z-index:9999;
+    animation:labelGlow 2s ease-in-out infinite;
+}
+
+@keyframes botFloat{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+}
+
+@keyframes labelGlow{
+    0%,100%{
+        opacity:.8;
+        transform:scale(1);
+    }
+    50%{
+        opacity:1;
+        transform:scale(1.08);
+    }
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="container">
-	<img src="rrr.jpeg" class="rr-logo">
 
 
 <h1>Company Category Finder</h1>
+
 
 <div class="bank-section">
 
@@ -407,8 +785,19 @@ table{
 </div>
 
 <div class="upload-box">
+  <div id="progressContainer" style="display:none;margin-top:10px;">
+    <div style="height:10px;background:#ddd;border-radius:20px;overflow:hidden;">
+        <div id="progressBar" style="height:10px;width:0%;background:#1565c0;transition:0.2s;"></div>
+    </div>
+    <div id="progressText" style="margin-top:5px;font-weight:bold;color:#1565c0;">
+        0%
+    </div>
+</div>
 
-<h3 style="color:#1565c0;">Upload Company List</h3>
+<h3 id="uploadTitle" style="color:#1565c0;">
+    Upload Company List
+</h3>
+
 <br>
 
 <label for="excelFile" id="fileBtn" class="file-btn">Upload Excel</label>
@@ -428,6 +817,9 @@ table{
 </div>
 
 <div id="resultCount"></div>
+
+
+
 
 
 <button id="historyBtn" style="
@@ -550,6 +942,60 @@ cursor:pointer;
 ">
 Close
 </button>
+
+</div>
+
+</div>
+
+<!-- CHATBOT BUTTON -->
+<div id="chatBotBtn">🤖</div>
+
+<div id="chatBotLabel">
+    Ask Me
+</div>
+
+<!-- CHATBOX -->
+
+<div id="chatBox">
+<div id="chatHeader">
+    Raj AI
+    <span id="chatClose">✖</span>
+</div>
+
+<div id="chatMessages"></div>
+
+<div id="chatFooter">
+<input type="text"
+id="chatInput"
+placeholder="Type message...">
+
+<button id="sendBtn">Send</button>
+</div>
+
+<div id="emiBox" style="display:none;padding:10px;">
+
+<h3>EMI Calculator</h3>
+
+<input id="emiAmount" type="number"
+placeholder="Loan Amount"
+style="width:100%;padding:8px;margin:5px 0;">
+
+<input id="emiRate" type="number"
+placeholder="ROI (%)"
+style="width:100%;padding:8px;margin:5px 0;">
+
+<input id="emiTenure" type="number"
+placeholder="Tenure (Months)"
+style="width:100%;padding:8px;margin:5px 0;">
+
+<button id="emiCalcBtn"
+style="margin-top:8px;padding:8px 12px;">
+Calculate EMI
+</button>
+
+<div id="emiResult"
+style="margin-top:10px;font-weight:bold;">
+</div>
 
 </div>
 
@@ -684,7 +1130,7 @@ const bankLinks = {
 
 
     poonawalla:{
-        login:"https://instant-pocket-loan.poonawallafincorp.com/?redirectto=primepl&utm_DSA_Code=FDL01450&UTM_Par…"    
+        login:"https://instant-pocket-loan.poonawallafincorp.com/?redirectto=primepl&utm_DSA_Code=FDL01450&UTM_Par"    
 		},
 
   
@@ -713,7 +1159,7 @@ function openBankPopup(bank){
     let validLinks = Object.values(data).filter(v => v && v.trim() !== "");
 
     if(validLinks.length === 0){
-        alert("There is no link ❌");
+        alert("There is no link ?");
         return;
     }
 
@@ -814,48 +1260,59 @@ function openDB(){
 window.addEventListener("load", async function(){
 
     let btn = document.getElementById("fileBtn");
+    let progressContainer = document.getElementById("progressContainer");
+    let progressBar = document.getElementById("progressBar");
+    let progressText = document.getElementById("progressText");
 
     await openDB();
 
     let file = await getExcelFromDB();
 
-    /* ✅ IF EXCEL EXISTS */
-   if(file){
+    if(file){
 
-    btn.innerText = "Loading Excel...";
+        btn.innerText = "Loading Excel...";
+        btn.classList.add("uploading");
 
-    btn.classList.remove("success");
+        progressContainer.style.display = "block";
 
-    document.getElementById("loading").innerText =
-    "Please wait...";
+        let percent = 0;
 
-    document.getElementById("searchInput").disabled = true;
+        let fakeProgress = setInterval(() => {
 
-    setTimeout(async () => {
+            percent += 5;
+            if(percent >= 90) percent = 90;
+
+            progressBar.style.width = percent + "%";
+            progressText.innerText = percent + "%";
+
+        }, 100);
+		
+		await new Promise(resolve => setTimeout(resolve, 100));
 
         await loadExcelData(file);
-
         excelLoaded = true;
 
-        btn.innerText = "Excel Uploaded ✔";
+        clearInterval(fakeProgress);
 
+        progressBar.style.width = "100%";
+        progressText.innerText = "100%";
+
+        btn.innerText = "Excel Loaded";
+		document.getElementById("uploadTitle").style.display = "none";
+        btn.classList.remove("uploading");
         btn.classList.add("success");
 
-        document.getElementById("loading").innerText = "";
+        setTimeout(() => {
+            progressContainer.style.display = "none";
+        }, 800);
 
-        document.getElementById("searchInput").disabled = false;
+    } else {
+    btn.innerText = "Upload Excel";
+    btn.classList.remove("success");
 
-    }, 30000)
+    document.getElementById("uploadTitle").style.display = "block";
 }
-    /* ✅ IF NO EXCEL */
-    else{
-
-        btn.innerText = "Upload Excel";
-
-        btn.classList.remove("success");
-    }
 });
-
 /* =========================
    SAVE FILE TO DB
 ========================= */
@@ -915,6 +1372,7 @@ function removeExcelFromDB(){
 
     document.getElementById("fileBtn").innerText =
     "Upload Excel";
+	document.getElementById("uploadTitle").style.display = "block";
 
     document.getElementById("searchInput").value = "";
 
@@ -927,7 +1385,7 @@ function removeExcelFromDB(){
     document.getElementById("downloadBtn").style.display = "none";
 
     document.getElementById("fileMsg").innerText =
-    "Excel removed ✔";
+    "Excel removed ";
 
     setTimeout(()=>{
 
@@ -959,7 +1417,7 @@ document.getElementById("fileBtn")
 
         let msg = document.getElementById("fileMsg");
 
-        msg.innerText = "Excel already uploaded ❌";
+        msg.innerText = "❌ Excel Already Uploaded ❌";
 
         setTimeout(()=>{
 
@@ -975,76 +1433,67 @@ document.getElementById("fileBtn")
 
      async function loadExcelData(file){
 
-    let reader = new FileReader();
+    return new Promise((resolve,reject)=>{
 
-    reader.onload = function(event){
+        let reader = new FileReader();
 
-        try{
+        reader.onload = function(event){
 
-            let data = new Uint8Array(event.target.result);
+            try{
 
-            let workbook = XLSX.read(data,{type:'array'});
+                let data = new Uint8Array(event.target.result);
 
-            allData = [];
-            companyMap.clear();
+                let workbook = XLSX.read(data,{type:'array'});
 
-            workbook.SheetNames.forEach(sheetName => {
+                allData = [];
+                companyMap.clear();
 
-                let sheet = workbook.Sheets[sheetName];
+                workbook.SheetNames.forEach(sheetName=>{
 
-                let json = XLSX.utils.sheet_to_json(sheet);
+                    let sheet = workbook.Sheets[sheetName];
 
-                json.forEach(row => {
+                    let json = XLSX.utils.sheet_to_json(sheet);
 
-                    let company = row["COMPANY NAME"];
-                    let category = row["Category"];
+                    json.forEach(row=>{
 
-                    if(company && category){
+                        let company = row["COMPANY NAME"];
+                        let category = row["Category"];
 
-                        let item = {
+                        if(company && category){
 
-                            bank: sheetName,
-                            company: company.toString().trim(),
-                            category: category.toString().trim()
-                        };
+                            let item = {
+                                bank: sheetName,
+                                company: company.toString().trim(),
+                                category: category.toString().trim()
+                            };
 
-                        allData.push(item);
+                            allData.push(item);
 
-                        let key = normalizeCompanyName(item.company);
+                            let key = normalizeCompanyName(item.company);
 
-                        if(!companyMap.has(key)){
+                            if(!companyMap.has(key)){
+                                companyMap.set(key,[]);
+                            }
 
-                            companyMap.set(key, []);
+                            companyMap.get(key).push(item);
                         }
-
-                        companyMap.get(key).push(item);
-                    }
+                    });
                 });
-            });
 
-            excelLoaded = true;
+                excelLoaded = true;
+                document.getElementById("searchInput").disabled = false;
 
-            document.getElementById("loading").innerText =
-            "Excel Loaded Successfully ✔";
+                resolve();
 
-            document.getElementById("searchInput").disabled = false;
+            }catch(err){
+                reject(err);
+            }
+        };
 
-            setTimeout(()=>{
+        reader.onerror = reject;
 
-                document.getElementById("loading").innerText = "";
-
-            },2000);
-
-        }catch(err){
-
-            console.error(err);
-
-            document.getElementById("loading").innerText =
-            "Excel Load Failed ❌";
-        }
-    };
-
-    reader.readAsArrayBuffer(file);
+        reader.readAsArrayBuffer(file);
+    });
 }
 
 /* =========================
@@ -1055,43 +1504,127 @@ document.getElementById("excelFile")
 .addEventListener("change", async function(e){
 
     let file = e.target.files[0];
-
     if(!file) return;
 
     let btn = document.getElementById("fileBtn");
+    let progressBar = document.getElementById("progressBar");
+    let progressText = document.getElementById("progressText");
+    let progressContainer = document.getElementById("progressContainer");
 
-    document.getElementById("loading").innerText =
-    "Loading Excel File...";
+    progressContainer.style.display = "block";
+    progressBar.style.width = "0%";
+    progressText.innerText = "0%";
 
     btn.innerText = "Uploading...";
-
+    btn.classList.add("uploading");
     btn.classList.remove("success","error");
 
-    try{
+    try {
 
         if(!db){
-
             await openDB();
         }
 
-        loadExcelData(file);
+// REAL FILE READ WITH PROGRESS
+let reader = new FileReader();
 
-        await saveExcelToDB(file);
+reader.onprogress = function(e){
+    if(e.lengthComputable){
+        let percent = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percent + "%";
+        progressText.innerText = "Reading " + percent + "%";
+    }
+};
 
+reader.onload = async function(event){
+
+    try {
+
+        let data = new Uint8Array(event.target.result);
+        let workbook = XLSX.read(data,{type:'array'});
+
+        allData = [];
+        companyMap.clear();
+
+        let totalSheets = workbook.SheetNames.length;
+        let processedSheets = 0;
+
+        for (let i = 0; i < workbook.SheetNames.length; i++) {
+
+            let sheetName = workbook.SheetNames[i];
+            let sheet = workbook.Sheets[sheetName];
+            let json = XLSX.utils.sheet_to_json(sheet);
+
+            for (let row of json) {
+
+                let company = row["COMPANY NAME"];
+                let category = row["Category"];
+
+                if(company && category){
+
+                    let item = {
+                        bank: sheetName,
+                        company: company.toString().trim(),
+                        category: category.toString().trim()
+                    };
+
+                    allData.push(item);
+
+                    let key = normalizeCompanyName(item.company);
+
+                    if(!companyMap.has(key)){
+                        companyMap.set(key, []);
+                    }
+
+                    companyMap.get(key).push(item);
+                }
+            }
+
+            // ⭐ sheet progress update
+            processedSheets++;
+
+            let parsePercent = Math.round((processedSheets / totalSheets) * 100);
+
+            progressBar.style.width = parsePercent + "%";
+            progressText.innerText = "Processing " + parsePercent + "%";
+
+            // ⭐ UI freeze avoid (IMPORTANT)
+            await new Promise(requestAnimationFrame);
+        }
+
+        excelLoaded = true;
+
+        progressBar.style.width = "100%";
+        progressText.innerText = "Done 100%";
+
+        btn.classList.remove("uploading");
         btn.classList.add("success");
+        btn.innerText = "Excel Uploaded";
+		document.getElementById("uploadTitle").style.display = "none";
 
-        btn.innerText = "Excel Uploaded ✔";
+        document.getElementById("searchInput").disabled = false;
 
-    }catch(err){
+        setTimeout(()=>{
+            progressContainer.style.display = "none";
+        },1200);
+
+    } catch(err){
 
         console.error(err);
 
         btn.classList.add("error");
-
         btn.innerText = "Upload Failed";
+    }
+};
 
-        document.getElementById("loading").innerText =
-        "Excel Load Failed ❌";
+reader.readAsArrayBuffer(file);
+
+await saveExcelToDB(file);
+
+    } catch(err){
+        console.error(err);
+        btn.classList.add("error");
+        btn.innerText = "Upload Failed";
     }
 });
 
@@ -1457,7 +1990,320 @@ document.getElementById("downloadBtn")
 
     }, "image/jpeg", 1.0);
 });
+
+
+
+const chatBtn = document.getElementById("chatBotBtn");
+const chatBox = document.getElementById("chatBox");
+
+chatBtn.onclick = function(){
+
+chatBox.style.display =
+chatBox.style.display === "flex"
+? "none"
+: "flex";
+
+if(chatBox.style.display === "flex"){
+
+document.getElementById("chatMessages").innerHTML = `
+
+<div style="color:#60a5fa;">
+<b>Raj AI:</b><br><br>
+
+<button class="chat-option"
+onclick="showHelp('upload')">
+📂 Upload Excel
+</button>
+
+<button class="chat-option"
+onclick="showHelp('history')">
+📜 History
+</button>
+
+<button class="chat-option"
+onclick="showHelp('remove')">
+🗑 Remove Excel
+</button>
+
+<button class="chat-option"
+onclick="showHelp('emi')">
+💰 EMI Calculator
+</button>
+
+
+
+</div>
+
+`;
+
+}
+
+};
+
+document.getElementById("sendBtn").onclick = function(){
+
+let input =
+document.getElementById("chatInput");
+
+let msg = input.value.trim();
+
+if(!msg) return;
+
+let area =
+document.getElementById("chatMessages");
+
+area.innerHTML +=
+`<div style="margin-bottom:8px;">
+<b>You:</b> ${msg}
+</div>`;
+
+let reply = "Hello Sir, I am Raj AI 🤖";
+
+if(msg.toLowerCase().includes("hello"))
+reply = "Hello Sir 👋";
+
+if(msg.toLowerCase().includes("excel"))
+reply = "Please upload Excel first.";
+
+if(msg.toLowerCase().includes("history"))
+reply = "Use History button to view searches.";
+
+area.innerHTML +=
+`<div style="margin-bottom:8px;color:#60a5fa;">
+<b>Raj AI:</b> ${reply}
+</div>`;
+
+input.value="";
+
+area.scrollTop = area.scrollHeight;
+
+};
+
+document.getElementById("chatInput")
+.addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+
+        document.getElementById("sendBtn").click();
+
+    }
+
+});
+
+
+function showHelp(type){
+
+let area =
+document.getElementById("chatMessages");
+
+if(type==="upload"){
+
+area.innerHTML += `
+<div style="margin-top:10px;color:#60a5fa;">
+<b>Raj AI:</b><br><br>
+
+Please upload Excel from your Desktop or Mobile device using the Upload Excel button.
+
+</div>`;
+}
+
+if(type==="history"){
+
+area.innerHTML += `
+<div style="margin-top:10px;color:#60a5fa;">
+<b>Raj AI:</b><br><br>
+
+History button shows your previous company searches.
+
+</div>`;
+}
+
+if(type==="remove"){
+
+area.innerHTML += `
+<div style="margin-top:10px;color:#60a5fa;">
+<b>Raj AI:</b><br><br>
+
+Don't use this button unless required.
+
+This button removes the uploaded Excel file from browser storage.
+
+</div>`;
+}
+
+if(type==="emi"){
+
+area.innerHTML += `
+<div id="emiCalculatorCard" style="
+margin-top:12px;
+padding:15px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(59,130,246,.3);
+border-radius:12px;
+">
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+">
+
+<div style="
+font-size:18px;
+font-weight:bold;
+color:#60a5fa;
+">
+💰 EMI Calculator
+</div>
+
+<span
+onclick="closeEMI()"
+style="
+cursor:pointer;
+font-size:22px;
+color:#ff4d4d;
+font-weight:bold;
+">
+✖
+</span>
+
+</div>
+
+<input id="emiAmount"
+type="number"
+placeholder="Loan Amount"
+style="
+width:100%;
+padding:10px;
+border-radius:8px;
+border:none;
+margin-bottom:10px;
+">
+
+<input id="emiRate"
+type="number"
+placeholder="ROI (%)"
+style="
+width:100%;
+padding:10px;
+border-radius:8px;
+border:none;
+margin-bottom:10px;
+">
+
+<input id="emiTenure"
+type="number"
+placeholder="Tenure (Months)"
+style="
+width:100%;
+padding:10px;
+border-radius:8px;
+border:none;
+margin-bottom:12px;
+">
+
+<div style="text-align:center;">
+
+<button onclick="calculateEMI()"
+style="
+padding:8px 20px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+">
+Calculate EMI
+</button>
+
+</div>
+
+<div id="emiResult"
+style="
+margin-top:15px;
+font-size:22px;
+font-weight:bold;
+text-align:center;
+color:#4ade80;
+">
+</div>
+
+</div>
+
+`;
+
+}
+
+area.scrollTop = area.scrollHeight;
+
+}
+
+document.getElementById("chatClose").onclick = function(){
+    document.getElementById("chatBox").style.display = "none";
+};
+
+
+
+function calculateEMI(){
+
+let P = parseFloat(
+document.getElementById("emiAmount").value
+);
+
+let annualRate = parseFloat(
+document.getElementById("emiRate").value
+);
+
+let N = parseInt(
+document.getElementById("emiTenure").value
+);
+
+if(!P || !annualRate || !N){
+
+document.getElementById("emiResult").innerHTML =
+"⚠ Please fill all fields";
+
+return;
+}
+
+let R = annualRate / 12 / 100;
+
+let EMI =
+(P * R * Math.pow(1+R,N))
+/
+(Math.pow(1+R,N)-1);
+
+EMI = EMI.toFixed(0);
+
+document.getElementById("emiResult").innerHTML =
+"✅ EMI: ₹" +
+Number(EMI).toLocaleString("en-IN");
+}
+
+function closeEMI(){
+
+let card = document.getElementById("emiCalculatorCard");
+
+if(card){
+    card.remove();
+}
+
+}
+
+
+
 </script>
 
+
+<div style="text-align:center;margin-top:20px;">
+    <img src="rr.png"
+         alt="Made By R.R"
+         class="rr-footer-logo">
+
+</div>
+
+
 </body>
+
 </html>
