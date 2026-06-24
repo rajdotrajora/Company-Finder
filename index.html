@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+
 <style>
 
 *{
@@ -350,14 +351,36 @@ border:2px dashed #3b82f6!important;
 .file-btn,#downloadBtn,#historyBtn,#removeExcelBtn{
 background:linear-gradient(135deg,#2563eb,#06b6d4)!important;
 }
-table,td{
-background:rgba(255,255,255,.06)!important;
-color:white!important;
-}
-th{
-background:#2563eb!important;
+
+table{
+background:transparent!important;
 }
 
+th{
+background:#2563eb!important;
+color:#fff!important;
+border:1px solid rgba(59,130,246,.4)!important;
+}
+
+td{
+background:rgba(15,23,42,.95)!important;
+color:#4ade80!important;
+border:1px solid rgba(59,130,246,.25)!important;
+font-weight:600;
+}
+
+td:nth-child(1),
+td:nth-child(2),
+td:nth-child(3){
+color:#4ade80!important;
+}
+
+.table-wrapper{
+background:rgba(15,23,42,.95)!important;
+border:1px solid rgba(59,130,246,.25)!important;
+border-radius:14px;
+overflow:hidden;
+}
 
 /* ===== RAJ AI PREMIUM OVERRIDE ===== */
 #suggestions:empty{display:none!important;}
@@ -475,7 +498,7 @@ color:#fff!important;
 }
 
 .not-listed{
-color:red!important;
+color:#ff4d4d!important;
 font-weight:bold!important;
 }
 
@@ -715,6 +738,136 @@ padding:6px 10px;
 font-size:12px;
 font-weight:bold;
 cursor:pointer;
+}
+
+td:nth-child(1),
+td:nth-child(2){
+color:#4ade80!important;
+font-weight:600;
+}
+
+td:nth-child(3){
+font-weight:700;
+}
+
+table tr{
+background:rgba(15,23,42,.95)!important;
+}
+
+table tr:nth-child(even){
+background:rgba(30,41,59,.95)!important;
+}
+
+table td{
+background:transparent!important;
+}
+
+.not-listed{
+color:#ff3b3b !important;
+font-weight:800 !important;
+text-shadow:0 0 8px rgba(255,59,59,.5);
+}
+
+td.not-listed{
+    color:#ff0000 !important;
+    font-weight:900 !important;
+    background:transparent !important;
+    text-shadow:0 0 10px rgba(255,0,0,.7) !important;
+}
+
+td:nth-child(3):not(.not-listed){
+background:linear-gradient(90deg,#86efac,#22c55e)!important;
+-webkit-background-clip:text!important;
+-webkit-text-fill-color:transparent!important;
+font-weight:800!important;
+text-shadow:0 0 8px rgba(74,222,128,.5);
+}
+
+
+/* Search Box Premium */
+
+.search-box input{
+background:#0f172a !important;
+color:#4ade80 !important;
+border:2px solid #2563eb !important;
+box-shadow:0 0 15px rgba(37,99,235,.35);
+}
+
+.search-box input::placeholder{
+color:#94a3b8 !important;
+}
+
+/* Suggestions Box */
+
+#suggestions{
+background:#0f172a !important;
+border:1px solid #2563eb !important;
+border-radius:12px !important;
+overflow:hidden;
+box-shadow:0 0 20px rgba(37,99,235,.35);
+}
+
+.suggestion-item{
+background:#0f172a !important;
+color:#4ade80 !important;
+border-bottom:1px solid rgba(37,99,235,.25) !important;
+font-weight:600;
+}
+
+.suggestion-item:hover{
+background:#1e293b !important;
+color:#86efac !important;
+}
+
+#searchInput{
+color:#4ade80 !important;
+font-weight:700;
+text-shadow:0 0 8px rgba(74,222,128,.35);
+}
+
+
+#countdownTimer{
+display:none;
+margin-top:10px;
+font-weight:800;
+font-size:22px;
+
+background:linear-gradient(
+90deg,
+#ff4d4d,
+#ffffff,
+#ff4d4d
+);
+
+background-size:200% auto;
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-align:center;
+
+text-shadow:
+0 0 10px rgba(255,77,77,.8),
+0 0 20px rgba(255,77,77,.6),
+0 0 35px rgba(255,77,77,.4);
+
+animation:
+countGlow 2s ease-in-out infinite,
+countMove 3s linear infinite;
+}
+
+@keyframes countGlow{
+0%,100%{
+filter:drop-shadow(0 0 8px rgba(255,77,77,.7));
+}
+50%{
+filter:drop-shadow(0 0 20px rgba(255,77,77,1));
+}
+}
+
+@keyframes countMove{
+0%{background-position:0% center;}
+100%{background-position:200% center;}
 }
 
 </style>
