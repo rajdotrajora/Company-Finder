@@ -539,8 +539,8 @@ drop-shadow(0 0 25px rgba(139,92,246,.7));
 position:fixed;
 right:20px;
 bottom:20px;
-width:65px;
-height:65px;
+width:100px;
+height:100px;
 border-radius:50%;
 background:linear-gradient(135deg,#2563eb,#06b6d4);
 display:flex;
@@ -653,8 +653,8 @@ font-size:16px;
     position:fixed;
     right:20px;
     bottom:25px;
-    width:60px;
-    height:60px;
+    width:100px;
+    height:100px;
     border-radius:50%;
     background:linear-gradient(135deg,#2563eb,#06b6d4);
     display:flex;
@@ -694,6 +694,27 @@ font-size:16px;
         opacity:1;
         transform:scale(1.08);
     }
+}
+
+
+
+.fore-btn-wrap{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+justify-content:center;
+margin-bottom:12px;
+}
+
+.fore-btn{
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+padding:6px 10px;
+font-size:12px;
+font-weight:bold;
+cursor:pointer;
 }
 
 </style>
@@ -947,11 +968,17 @@ Close
 
 </div>
 
-<!-- CHATBOT BUTTON -->
-<div id="chatBotBtn">🤖</div>
+<div id="chatBotBtn">
+    <img src="ai.jpg"
+         style="
+         width:97px;
+         height:97px;
+         border-radius:50%;
+         object-fit:cover;">
+</div>
 
 <div id="chatBotLabel">
-    Ask Me
+    CHAT BOT AI
 </div>
 
 <!-- CHATBOX -->
@@ -1141,7 +1168,6 @@ const bankLinks = {
     }
 };
 let currentBank = "";
-
 /* =========================
    POPUP CODE
 ========================= */
@@ -2004,11 +2030,14 @@ chatBox.style.display === "flex"
 : "flex";
 
 if(chatBox.style.display === "flex"){
-
 document.getElementById("chatMessages").innerHTML = `
 
 <div style="color:#60a5fa;">
 <b>Raj AI:</b><br><br>
+
+Please select an option:
+
+<br><br>
 
 <button class="chat-option"
 onclick="showHelp('upload')">
@@ -2029,19 +2058,19 @@ onclick="showHelp('remove')">
 onclick="showHelp('emi')">
 💰 EMI Calculator
 </button>
+<button class="chat-option"
+onclick="showHelp('foreclosure')">
+🏦 Foreclosure Charges
+</button>
 
-
-
-</div>
-
-`;
-
+</div>`;
 }
 
 };
 
-document.getElementById("sendBtn").onclick = function(){
-
+document.getElementById("sendBtn").onclick = async function(){
+let area =
+document.getElementById("chatMessages");
 let input =
 document.getElementById("chatInput");
 
@@ -2049,29 +2078,68 @@ let msg = input.value.trim();
 
 if(!msg) return;
 
-let area =
-document.getElementById("chatMessages");
-
 area.innerHTML +=
 `<div style="margin-bottom:8px;">
 <b>You:</b> ${msg}
 </div>`;
 
-let reply = "Hello Sir, I am Raj AI 🤖";
+const thinkingDiv = document.createElement("div");
 
-if(msg.toLowerCase().includes("hello"))
-reply = "Hello Sir 👋";
+thinkingDiv.style.color = "#60a5fa";
+thinkingDiv.style.marginBottom = "8px";
 
-if(msg.toLowerCase().includes("excel"))
-reply = "Please upload Excel first.";
+thinkingDiv.innerHTML =
+"<b>Raj AI:</b> Thinking...";
 
-if(msg.toLowerCase().includes("history"))
-reply = "Use History button to view searches.";
+area.appendChild(thinkingDiv);
 
-area.innerHTML +=
-`<div style="margin-bottom:8px;color:#60a5fa;">
-<b>Raj AI:</b> ${reply}
-</div>`;
+area.scrollTop = area.scrollHeight;
+
+
+let lowerMsg = msg.toLowerCase().trim();
+
+let reply = "";
+
+if(
+lowerMsg.includes("kon ho") ||
+lowerMsg.includes("kaun ho") ||
+lowerMsg.includes("who are you") ||
+lowerMsg.includes("kiske assistant ho") ||
+lowerMsg.includes("kis ke assistant ho") ||
+lowerMsg.includes("assistant ho")
+){
+reply = "Main Raj Sir ka Personal AI Assistant hoon 🤖";
+}
+else if(
+lowerMsg.includes("naam") ||
+lowerMsg.includes("name") ||
+lowerMsg.includes("tumhara name") ||
+lowerMsg.includes("your name")
+){
+reply = "Mera naam Raj AI Assistant hai 🤖";
+}
+else if(
+lowerMsg.includes("kisne banaya") ||
+lowerMsg.includes("tumko bnaya kisne") ||
+lowerMsg.includes("tumhe kisne banaya") ||
+lowerMsg.includes("creator") ||
+lowerMsg.includes("owner") ||
+lowerMsg.includes("who made you")
+){
+reply = "Mujhe Raj Sir ne banaya hai aur main unka Assistant hoon 😎";
+}
+else if(
+lowerMsg === "tum kon ho" ||
+lowerMsg === "kaun ho" ||
+lowerMsg === "who are you"
+){
+reply = "Main Raj AI Assistant hoon 🤖";
+}
+else{
+reply = await askAI(msg);
+}
+thinkingDiv.innerHTML =
+`<b>Raj AI:</b> ${reply}`;
 
 input.value="";
 
@@ -2131,7 +2199,104 @@ This button removes the uploaded Excel file from browser storage.
 </div>`;
 }
 
+if(type==="foreclosure"){
+
+
+if(document.getElementById("foreclosureCard")){
+    return;
+}
+
+
+area.innerHTML += `
+<div id="foreclosureCard" style="
+margin-top:12px;
+padding:15px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(59,130,246,.3);
+border-radius:12px;
+">
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+">
+
+<div style="
+font-size:18px;
+font-weight:bold;
+color:#60a5fa;
+">
+🏦 Foreclosure Charges
+</div>
+
+<span
+onclick="closeForeclosure()"
+style="
+cursor:pointer;
+font-size:22px;
+color:#ff4d4d;
+font-weight:bold;
+">
+✖
+</span>
+
+</div>
+
+<div id="foreclosureResult"
+style="
+margin-bottom:12px;
+padding:10px;
+border-radius:10px;
+background:rgba(37,99,235,.15);
+border:1px solid rgba(37,99,235,.4);
+color:#4ade80;
+font-weight:bold;
+text-align:left;
+white-space:pre-line;
+">
+Select Bank
+</div>
+<div class="fore-btn-wrap">
+
+<button class="fore-btn" onclick="showForeclosure('hdfc')">🏦 HDFC</button>
+
+<button class="fore-btn" onclick="showForeclosure('icici')">🏦 ICICI</button>
+
+<button class="fore-btn" onclick="showForeclosure('axis')">🏦 Axis</button>
+
+<button class="fore-btn" onclick="showForeclosure('kotak')">🏦 Kotak</button>
+
+<button class="fore-btn" onclick="showForeclosure('idfc')">🏦 IDFC</button>
+
+<button class="fore-btn" onclick="showForeclosure('piramal')">🏦 Piramal</button>
+
+<button class="fore-btn" onclick="showForeclosure('poonawalla')">🏦 Poonawalla</button>
+
+<button class="fore-btn" onclick="showForeclosure('bajaj')">🏦 Bajaj</button>
+
+<button class="fore-btn" onclick="showForeclosure('tata')">🏦 Tata</button>
+
+<button class="fore-btn" onclick="showForeclosure('aditya')">🏦 Aditya</button>
+
+<button class="fore-btn" onclick="showForeclosure('incred')">🏦 InCred</button>
+
+</div>
+
+
+
+
+
+</div>
+`;
+}
+
 if(type==="emi"){
+
+if(document.getElementById("emiCalculatorCard")){
+    return;
+}
 
 area.innerHTML += `
 <div id="emiCalculatorCard" style="
@@ -2291,6 +2456,231 @@ if(card){
 
 }
 
+function showForeclosure(bank){
+
+let charges = {
+
+hdfc: `
+🏦 HDFC Bank
+
+✅ 13–24 Months → 4% + GST
+
+✅ 25–36 Months → 3% + GST
+
+✅ 37–48 Months → 2% + GST
+
+✅ After 48 Months → NIL
+
+⚠ Foreclosure allowed only after 12 EMIs paid.
+`,
+icici: `
+🏦 ICICI Bank
+
+✅ Foreclosure allowed after 1 EMI
+
+✅ Up to 24 EMIs completed → 3% of Principal Outstanding + GST
+
+✅ After 24 EMIs → NIL
+
+⚠ Applicable as per loan terms and bank policy.
+`,
+
+
+kotak: `
+
+🏦 KOTAK BANK
+
+✅ Up to 3 Years:
+4% + GST on Outstanding Principal
+
+✅ After 3 Years:
+2% + GST on Outstanding Principal
+
+⚠ Foreclosure allowed after servicing the first EMI.
+
+`,
+axis: `
+
+🏦 AXIS BANK
+
+✅ Up to 36 Months:
+3% + GST on Outstanding Principal
+
+✅ Above 36 Months:
+2% + GST on Outstanding Principal
+
+⚠ Foreclosure charges applicable on Principal Outstanding.
+
+`,
+idfc: `
+🏦 IDFC FIRST Bank
+
+✅ Foreclosure allowed after 12 EMIs
+
+✅ Foreclosure Charges → 5% of Principal Outstanding + GST
+
+⚠ Some products like FIRSTmoney may have NIL foreclosure charges.
+`,
+
+piramal: `
+🏦 PIRAMAL FINANCE
+
+✅ Personal Loan Foreclosure:
+Up to 4%–5% + GST on Outstanding Principal
+
+✅ Some Personal Loan Variants:
+NIL Charges after eligible period (as per loan terms)
+
+⚠ Charges may vary depending on loan product.
+`,
+
+poonawalla: `
+🏦 POONAWALLA FINCORP
+
+✅ Own Funds Closure:
+NIL Charges
+
+✅ Balance Transfer / Third Party Funds:
+Up to 5% + GST on Outstanding Principal
+
+✅ After First 6 EMIs:
+Some products may have NIL Foreclosure Charges
+
+⚠ Charges depend on loan scheme.
+`,
+
+bajaj: `
+🏦 BAJAJ FINSERV
+
+✅ Foreclosure allowed after First EMI
+
+✅ Personal Loan Foreclosure:
+Up to 4% + GST on Outstanding Principal
+
+✅ Maximum Charges:
+Up to 4.72% (Inclusive of Taxes)
+
+⚠ Charges may vary as per loan product.
+`,
+
+tata: `
+🏦 TATA CAPITAL
+
+✅ Foreclosure within First 12 Months:
+6.5% + GST on Outstanding Principal
+
+✅ After 12 Months:
+4.5% + GST on Outstanding Principal
+
+⚠ Charges applicable on Outstanding Principal Amount.
+`,
+
+aditya: `
+🏦 ADITYA BIRLA
+
+✅ Individual Personal Loans:
+NIL Foreclosure Charges
+
+✅ Other Loan Categories:
+Up to 4% + GST on Outstanding Principal
+
+⚠ Conditions as per loan policy.
+`,
+
+incred: `
+
+🏦 INCRED FINANCE
+
+✅ Foreclosure allowed after 6 EMIs
+
+✅ Foreclosure Charges:
+Up to 5% + GST on Outstanding Principal
+
+⚠ Charges may vary as per loan agreement.
+
+`
+
+};
+
+document.getElementById("foreclosureResult").innerHTML =
+charges[bank];
+
+}
+
+function closeForeclosure(){
+
+let card =
+document.getElementById("foreclosureCard");
+
+if(card){
+card.remove();
+}
+
+}
+
+async function askAI(message){
+
+try{
+
+const response = await fetch(
+"https://openrouter.ai/api/v1/chat/completions",
+{
+method:"POST",
+headers:{
+"Authorization":"Bearer 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",
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+model:"openai/gpt-4o-mini",
+messages:[
+{
+role:"system",
+content: `You are Raj AI Assistant created by Raj Sir.
+
+If user asks:
+- Who are you → say you are Raj AI Assistant.
+- Who created you → Raj Sir created and customized you.
+- Who is your owner → Raj Sir.
+
+But if user asks about ChatGPT, OpenAI, GPT, AI models, technology, history, coding, science or any general topic, answer normally and correctly.
+
+Do not force every answer back to Raj Sir.
+`
+},
+{
+role:"user",
+content:message
+}
+]
+})
+});
+
+const data = await response.json();
+
+console.log(data);
+
+if(data.error){
+return "API Error: " + data.error.message;
+}
+
+if(
+data &&
+data.choices &&
+data.choices[0] &&
+data.choices[0].message
+){
+return data.choices[0].message.content;
+}
+
+return "No response received";
+}catch(err){
+
+console.error(err);
+return "Connection Error";
+
+}
+
+}
 
 
 </script>
