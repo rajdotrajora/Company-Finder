@@ -8,7 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-
 <style>
 
 *{
@@ -22,6 +21,7 @@ body{
     background:#f3f3f3;
     padding:20px;
 }
+
 
 .container{
     width:80%;
@@ -457,8 +457,8 @@ transform:scaleX(.6);
 }
 }
 .bank-card{
-background:#fff!important;
-border:1px solid #e5e7eb!important;
+background:transparent!important;
+border:2px solid #3b82f6!important;
 border-radius:14px!important;
 transition:.25s;
 }
@@ -471,7 +471,7 @@ transform:translateY(-4px);
 width:100%!important;
 height:100%!important;
 object-fit:contain!important;
-background:#fff!important;
+background:transparent!important;
 }
 
 .search-box input{
@@ -870,6 +870,48 @@ filter:drop-shadow(0 0 20px rgba(255,77,77,1));
 100%{background-position:200% center;}
 }
 
+.bank-card{
+    background:linear-gradient(135deg,#07152f,#0b1f45);
+    border:2px solid #3b82f6;
+    border-radius:18px;
+    overflow:hidden;
+    position:relative;
+
+    box-shadow:
+    0 0 12px rgba(59,130,246,.7),
+    inset 0 0 20px rgba(59,130,246,.15);
+
+    transition:.3s;
+}
+
+.bank-card:hover{
+    transform:translateY(-5px) scale(1.03);
+
+    box-shadow:
+    0 0 20px rgba(59,130,246,.9),
+    0 0 40px rgba(59,130,246,.5),
+    inset 0 0 25px rgba(59,130,246,.2);
+}
+
+.bank-card img{
+    width:90%;
+    height:90%;
+    object-fit:contain;
+
+    display:block;
+    margin:auto;
+
+    filter:
+    drop-shadow(0 0 8px rgba(59,130,246,.8))
+    drop-shadow(0 0 18px rgba(59,130,246,.5));
+}
+
+.icici-logo{
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+}
+
 </style>
 </head>
 
@@ -885,76 +927,53 @@ filter:drop-shadow(0 0 20px rgba(255,77,77,1));
 
 <div class="bank-grid">
 
-<div class="bank-card" onclick="openBankPopup('hdfc')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg"
-    onerror="this.src='logo/HDFC.svg'">
+<div class="bank-card">
+    <img src="logo/hdfc.png" class="hdfc-logo">
+</div>
+
+<div class="bank-card">
+    <img src="logo/ICICI.png" class="icici-logo">
+</div>
+
+<div class="bank-card">
+    <img src="logo/axis.png" class="axis-logo">
+</div>
+<div class="bank-card">
+    <img src="logo/KOTAK.png" class="kotak-logo">
+</div>
+
+     <div class="bank-card">
+    <img src="logo/idfc.png" class="idfc-logo">
+</div>
+   
+   
+     <div class="bank-card">
+    <img src="logo/tata.png" class="tata-logo">
+</div>
+
+   <div class="bank-card">
+    <img src="logo/aditya.png" class="aditya-logo">
 </div>
 
 
-
-<div class="bank-card" onclick="openBankPopup('icici')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/ICICI_Bank_Logo.svg"
-    onerror="this.src='logo/ICICI.svg'">
-
+   <div class="bank-card">
+    <img src="logo/poona.png" class="Poonawalla-logo">
 </div>
 
-<div class="bank-card" onclick="openBankPopup('axis')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Axis_Bank_logo.svg"
-    onerror="this.src='logo/Axis.svg'">
-	</div>
+   <div class="bank-card">
+    <img src="logo/piramal.png" class="piramal-logo">
+</div>
 
-<div class="bank-card" onclick="openBankPopup('kotak')">
-  <img src="https://upload.wikimedia.org/wikipedia/en/3/39/Kotak_Mahindra_Group_logo.svg"
-    onerror="this.src='logo/KOTAK.svg'">
+   <div class="bank-card">
+    <img src="logo/INCRED.png" class="incred-logo">
+</div>
 	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('idfc')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_of_IDFC_First_Bank.svg"
-    onerror="this.src='logo/IDFC.svg'">
-	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('tata')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Tata_Capital_Logo-01.jpg"
-    onerror="this.src='logo/TATA.svg'">
-	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('birla')">
-  <img src="https://upload.wikimedia.org/wikipedia/en/7/75/Aditya_Birla_Group_Logo.svg"
-    onerror="this.src='logo/Aditya Birla.svg'">
-	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('poonawalla')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Poonawalla-Fincorp-Logo.jpg"
-    onerror="this.src='logo/POONAWALLA.svg'">
-	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('piramal')">
-  <img src="https://logowik.com/content/uploads/images/piramal7124.jpg"
-    onerror="this.src='logo/Piramal.svg.svg'">
-	
-	</div>
-
-<div class="bank-card" onclick="openBankPopup('incred')">
-  <img src="https://play-lh.googleusercontent.com/Ar2eAxovpaoPdxymnO5YY8NNOnGivJKCeBGh2RWxzTt13A2W2MjxJPnxZuS8eFPxYiaDTJhsiRF52pyc6CIyPg"
-    onerror="this.src='logo/incred.svg.svg'">
-	
-	</div>
-<div class="bank-card" onclick="openBankPopup('bajaj')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Bajaj_Finserv_Logo.svg"
-    onerror="this.src='logo/bajaj.svg'">
-	
-	</div>
-	
-	<div class="bank-card" onclick="openBankPopup('cibil')">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/TU-CIBIL-logo.jpg"
-    onerror="this.src='logo/TU-CIBIL-logo.jpg'">
-	
-	</div>
+ <div class="bank-card">
+    <img src="logo/bajaj.png" class="bajaj-logo">
+</div>
+ <div class="bank-card">
+    <img src="logo/cibil.png" class="cibil-logo">
+</div>
 </div>
 </div>
 
@@ -1038,7 +1057,10 @@ border:1px solid #ddd;
 border-radius:8px;
 padding:10px;
 margin-bottom:10px;
-"></div>
+">'</div>
+
+
+
 <div id="countdownTimer"
 style="
 display:none;
@@ -1122,7 +1144,7 @@ Close
 </div>
 
 <div id="chatBotBtn">
-    <img src="ai.jpg"
+    <img src="logo/ai.jpg"
          style="
          width:97px;
          height:97px;
@@ -2288,6 +2310,8 @@ lowerMsg === "who are you"
 ){
 reply = "Main Raj AI Assistant hoon 🤖";
 }
+
+
 else{
 reply = await askAI(msg);
 }
@@ -2840,7 +2864,7 @@ return "Connection Error";
 
 
 <div style="text-align:center;margin-top:20px;">
-    <img src="rr.png"
+    <img src="logo/rr.png"
          alt="Made By R.R"
          class="rr-footer-logo">
 
