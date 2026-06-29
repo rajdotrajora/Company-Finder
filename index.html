@@ -912,6 +912,112 @@ filter:drop-shadow(0 0 20px rgba(255,77,77,1));
     object-fit:cover !important;
 }
 
+
+	#analogClock{
+position:fixed;
+top:20px;
+right:20px;
+width:120px;
+height:120px;
+z-index:9999;
+}
+
+.clock-face{
+width:100%;
+height:100%;
+border-radius:50%;
+background:rgba(18,28,60,.55);
+backdrop-filter:blur(12px);
+border:3px solid #3da0ff;
+box-shadow:
+0 0 25px #2f8fff,
+inset 0 0 18px rgba(255,255,255,.15);
+position:relative;
+}
+
+.number{
+position:absolute;
+color:#fff;
+font-size:11px;
+font-weight:bold;
+text-shadow:0 0 8px cyan;
+font-family:Arial,sans-serif;
+}
+
+.n12{top:4px;left:50%;transform:translateX(-50%);}
+.n1{top:10px;right:28px;}
+.n2{top:28px;right:10px;}
+.n3{top:50%;right:4px;transform:translateY(-50%);}
+.n4{bottom:28px;right:10px;}
+.n5{bottom:10px;right:28px;}
+.n6{bottom:4px;left:50%;transform:translateX(-50%);}
+.n7{bottom:10px;left:28px;}
+.n8{bottom:28px;left:10px;}
+.n9{top:50%;left:4px;transform:translateY(-50%);}
+.n10{top:28px;left:8px;}
+.n11{top:10px;left:24px;}
+
+.hand{
+position:absolute;
+left:50%;
+bottom:50%;
+transform-origin:bottom;
+border-radius:20px;
+}
+
+.hour{
+width:5px;
+height:32px;
+background:white;
+margin-left:-3px;
+}
+
+.minute{
+width:3px;
+height:45px;
+background:#63c7ff;
+margin-left:-2px;
+}
+
+.second{
+width:2px;
+height:52px;
+background:red;
+margin-left:-1px;
+}
+
+.center-dot{
+position:absolute;
+width:10px;
+height:10px;
+background:red;
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+box-shadow:0 0 12px red;
+}
+#digitalClock{
+    margin-top:8px;
+    text-align:center;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    text-shadow:0 0 10px cyan;
+    font-family:Arial,sans-serif;
+}
+
+#clockDate{
+    margin-top:3px;
+    text-align:center;
+    color:#9fd8ff;
+    font-size:12px;
+    font-weight:600;
+    text-shadow:0 0 8px #00bfff;
+    font-family:Arial,sans-serif;
+}
+
+
 </style>
 </head>
 
@@ -1144,6 +1250,36 @@ Close
 
 </div>
 
+
+<!-- Floating Analog Clock -->
+<div id="analogClock">
+    <div class="clock-face">
+
+        <div class="number n1">1</div>
+        <div class="number n2">2</div>
+        <div class="number n3">3</div>
+        <div class="number n4">4</div>
+        <div class="number n5">5</div>
+        <div class="number n6">6</div>
+        <div class="number n7">7</div>
+        <div class="number n8">8</div>
+        <div class="number n9">9</div>
+        <div class="number n10">10</div>
+        <div class="number n11">11</div>
+        <div class="number n12">12</div>
+
+        <div id="hour" class="hand hour"></div>
+        <div id="minute" class="hand minute"></div>
+        <div id="second" class="hand second"></div>
+
+        <div class="center-dot"></div>
+
+    </div>
+<div id="digitalClock">12:00:00 PM</div>
+<div id="clockDate">Sunday, 29 June 2026</div>
+</div>
+
+	
 <div id="chatBotBtn">
     <img src="logo/ai.jpg"
          style="
@@ -2860,6 +2996,49 @@ return "Connection Error";
 
 }
 
+
+	function updateClock(){
+
+const now = new Date();
+
+const sec = now.getSeconds();
+const min = now.getMinutes();
+const hr = now.getHours() % 12;
+
+// Analog Clock
+const secDeg = sec * 6;
+const minDeg = min * 6 + sec * 0.1;
+const hrDeg = hr * 30 + min * 0.5;
+
+document.getElementById("second").style.transform =
+`translateX(-50%) rotate(${secDeg}deg)`;
+
+document.getElementById("minute").style.transform =
+`translateX(-50%) rotate(${minDeg}deg)`;
+
+document.getElementById("hour").style.transform =
+`translateX(-50%) rotate(${hrDeg}deg)`;
+
+// Digital Time
+let hour24 = now.getHours();
+let hour12 = hour24 % 12 || 12;
+let ampm = hour24 >= 12 ? "PM" : "AM";
+
+document.getElementById("digitalClock").innerHTML =
+`${String(hour12).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')} ${ampm}`;
+
+// Date
+const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+document.getElementById("clockDate").innerHTML =
+`${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+}
+
+updateClock();
+setInterval(updateClock,1000);
 
 </script>
 
