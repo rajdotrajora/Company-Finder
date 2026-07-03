@@ -175,7 +175,8 @@ table{
 th,td{
     border:1px solid #ddd;
     padding:12px;
-    text-align:left;
+    text-align:center;
+    vertical-align:middle;
     word-break:break-word;
 }
 
@@ -1187,9 +1188,9 @@ Result clear in: 120s
 <table id="resultTable" style="display:none;">
 <thead>
 <tr>
-<th>Bank</th>
-<th>Company</th>
-<th>Category</th>
+    <th>Company</th>
+    <th>Bank</th>
+    <th>Category</th>
 </tr>
 </thead>
 
@@ -2078,23 +2079,23 @@ suggestions.addEventListener("click", function(e){
 
             foundBanks++;
 
-            html += `
-            <tr>
-                <td>${match.bank}</td>
-                <td>${match.company}</td>
-                <td>${match.category}</td>
-            </tr>`;
+        html += `
+<tr>
+    <td>${match.company}</td>
+    <td>${match.bank}</td>
+    <td>${match.category}</td>
+</tr>`;
 
             lastResult.push(match);
 
         }else{
 
-            html += `
-            <tr>
-                <td>${bank}</td>
-                <td>${company}</td>
-                <td class="not-listed">NOT LISTED</td>
-            </tr>`;
+          html += `
+<tr>
+    <td>${company}</td>
+    <td>${bank}</td>
+    <td class="not-listed">NOT LISTED</td>
+</tr>`;
         }
     });
 
