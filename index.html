@@ -2699,6 +2699,16 @@ window.addEventListener("load", async function(){
         await loadExcelData(file);
         excelLoaded = true;
 
+		let pinFile = await getPincodeFromDB();
+
+if(pinFile){
+
+    await loadPincodeExcel(pinFile);
+
+    pincodeLoaded = true;
+
+}
+
         clearInterval(fakeProgress);
 
         progressBar.style.width = "100%";
@@ -2738,6 +2748,42 @@ function saveExcelToDB(file){
 
         tx.onerror = err => reject(err);
     });
+}
+
+	function savePincodeToDB(file){
+
+    return new Promise((resolve,reject)=>{
+
+        let tx = db.transaction(STORE_NAME,"readwrite");
+
+        let store = tx.objectStore(STORE_NAME);
+
+        store.put(file,"pincodeFile");
+
+        tx.oncomplete = ()=>resolve();
+
+        tx.onerror = err=>reject(err);
+
+    });
+
+}
+
+function getPincodeFromDB(){
+
+    return new Promise((resolve,reject)=>{
+
+        let tx = db.transaction(STORE_NAME,"readonly");
+
+        let store = tx.objectStore(STORE_NAME);
+
+        let req = store.get("pincodeFile");
+
+        req.onsuccess = ()=>resolve(req.result);
+
+        req.onerror = err=>reject(err);
+
+    });
+
 }
 
 /* =========================
@@ -4069,7 +4115,7 @@ document.getElementById("pincodeFile").addEventListener("change", async function
     if(!file) return;
 
     await loadPincodeExcel(file);
-
+    await savePincodeToDB(file);
     pincodeLoaded = true;
 
     alert("Pincode Excel Loaded Successfully");
