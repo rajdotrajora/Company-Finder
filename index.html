@@ -6,7 +6,7 @@
 <title>Company Category Finder</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
 <script src="pincode.js"></script>
 
 <style>
@@ -3361,47 +3361,29 @@ function openLink(type){
 document.getElementById("downloadBtn")
 .addEventListener("click", async function(){
 
-    let area = document.getElementById("tableArea");
+    const area = document.getElementById("tableArea");
 
-    let oldOverflow = area.style.overflow;
-    let oldWidth = area.style.width;
+    try{
 
-    area.style.overflow = "visible";
-    area.style.width = "max-content";
-
-    const canvas = await html2canvas(area, {
-
-        scale: 4,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        windowWidth: document.documentElement.scrollWidth,
-        windowHeight: document.documentElement.scrollHeight
-    });
-
-    area.style.overflow = oldOverflow;
-    area.style.width = oldWidth;
-
-    canvas.toBlob(function(blob){
-
-        const url = URL.createObjectURL(blob);
+        const dataUrl = await htmlToImage.toJpeg(area,{
+            quality:1,
+            pixelRatio:4,
+            cacheBust:true,
+            backgroundColor:"#ffffff"
+        });
 
         const a = document.createElement("a");
-
-        a.href = url;
-
+        a.href = dataUrl;
         a.download = "company-result.jpg";
-
-        document.body.appendChild(a);
-
         a.click();
 
-        document.body.removeChild(a);
+    }catch(err){
 
-        URL.revokeObjectURL(url);
+        console.error(err);
+        alert("JPG Download Failed");
 
-    }, "image/jpeg", 1.0);
+    }
+
 });
 
 
