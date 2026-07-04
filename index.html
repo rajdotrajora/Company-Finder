@@ -3238,6 +3238,10 @@ suggestions.addEventListener("click", function(e){
 
     document.getElementById("resultTable").style.display =
     "table";
+	document.getElementById("tableArea").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+});
 clearTimeout(autoClearTimer);
 clearInterval(countdownInterval);
 
@@ -4349,6 +4353,10 @@ Distance : ${data.distance}
     document.getElementById("resultCount").innerText="Pincode Found";
 
     document.getElementById("downloadBtn").style.display="inline-block";
+	document.getElementById("tableArea").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+});
 
 });
 
