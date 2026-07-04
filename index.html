@@ -2698,7 +2698,7 @@ window.addEventListener("load", async function(){
 
         await loadExcelData(file);
         excelLoaded = true;
-
+		
 		let pinFile = await getPincodeFromDB();
 
 if(pinFile){
@@ -2750,7 +2750,8 @@ function saveExcelToDB(file){
     });
 }
 
-	function savePincodeToDB(file){
+
+function savePincodeToDB(file){
 
     return new Promise((resolve,reject)=>{
 
@@ -2817,10 +2818,17 @@ function removeExcelFromDB(){
     let store = tx.objectStore(STORE_NAME);
 
     store.delete("excelFile");
+	store.delete("pincodeFile");
 
-    allData = [];
-    companyMap.clear();
-    excelLoaded = false;
+allData = [];
+companyMap.clear();
+excelLoaded = false;
+
+pincodeData = [];
+pincodeMap.clear();
+pincodeLoaded = false;
+
+document.getElementById("pincodeFile").value = "";
 	document.getElementById("excelFile").value = "";
 
     document.getElementById("fileBtn").innerText =
@@ -3431,8 +3439,6 @@ document.getElementById("downloadBtn")
     }
 
 });
-
-
 
 const chatBtn = document.getElementById("chatBotBtn");
 const chatBox = document.getElementById("chatBox");
@@ -4115,7 +4121,8 @@ document.getElementById("pincodeFile").addEventListener("change", async function
     if(!file) return;
 
     await loadPincodeExcel(file);
-    await savePincodeToDB(file);
+	await savePincodeToDB(file);
+
     pincodeLoaded = true;
 
     alert("Pincode Excel Loaded Successfully");
@@ -4128,6 +4135,14 @@ async function loadPincodeExcel(file){
     return new Promise((resolve,reject)=>{
 
         const reader = new FileReader();
+		
+		reader.onprogress = function(e){
+    if(e.lengthComputable){
+        let percent = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percent + "%";
+        progressText.innerText = "Reading Pincode Excel " + percent + "%";
+    }
+};
 
         reader.onload = function(event){
 
@@ -4203,6 +4218,9 @@ async function loadPincodeExcel(file){
                     pincodeData.length,
                     "Pincodes"
                 );
+				
+				progressBar.style.width = "100%";
+progressText.innerText = "Pincode Excel Loaded";
 
                 resolve();
 
@@ -4346,6 +4364,7 @@ document.getElementById("analogClock").addEventListener("click",function(){
     }
 
 });
+
 function updateClock(){
 
 const now = new Date();
