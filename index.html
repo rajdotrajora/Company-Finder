@@ -4430,30 +4430,37 @@ document.addEventListener("click", function(e){
     let foundCount = 0;
     lastResult = [];
 
-    banks.forEach(bank => {
+banks.forEach(bank => {
 
-        const match = foundByBank.get(bank);
+    const match = foundByBank.get(bank);
 
-        if(match){
-            foundCount++;
-            lastResult.push(match);
+    if(match){
 
-            html += `
-            <tr>
-                <td>${match.bank}</td>
-                <td>${match.pincode}</td>
-                <td>
-                    ${match.city || ""}<br>
-                    ${match.state || ""}<br>
-                    ${match.branch ? "Branch : " + match.branch + "<br>" : ""}
-                    ${match.distance ? "Distance : " + match.distance : "FOUND"}
-                </td>
-            </tr>`;
-        }
-        // Agar pincode is bank ki sheet me nahi hai,
-        // to bank ko table me bilkul show nahi karna hai.
-        // Sirf FOUND banks hi table me aayenge.
-    });
+        foundCount++;
+        lastResult.push(match);
+
+        html += `
+        <tr>
+            <td>${match.bank}</td>
+            <td>${match.pincode}</td>
+            <td>
+                ${match.city || ""}<br>
+                ${match.state || ""}<br>
+                Branch : ${match.branch || "NOT FOUND"}<br>
+                ${match.distance ? "Distance : " + match.distance : "FOUND"}
+            </td>
+        </tr>`;
+
+    }else{
+
+        html += `
+        <tr>
+            <td>${bank}</td>
+            <td>NOT FOUND</td>
+            <td>Branch : NOT FOUND</td>
+        </tr>`;
+    }
+});
 
     document.getElementById("resultBody").innerHTML = html;
     document.getElementById("resultCount").innerText =
