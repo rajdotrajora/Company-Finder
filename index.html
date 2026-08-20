@@ -4161,139 +4161,194 @@ return "Connection Error";
 
 
 
-
 /* ===========================
-   PINCODE MODULE - PART 1
+   PINCODE MODULE - AUTO MULTI BANK
+   Har Excel sheet = ek bank
+   Future me nayi sheet add karoge to automatically read hogi.
 =========================== */
 
+function normalizePincodeValue(value){
+    if(value === null || value === undefined) return "";
 
+    let s = String(value).trim();
+
+    // Excel numeric values kabhi 110092.0 aa sakte hain
+    if(/^\d+\.0+$/.test(s)) s = s.split('.')[0];
+
+    // Sirf valid 6 digit Indian pincode accept karo
+    return /^\d{6}$/.test(s) ? s : "";
+}
+
+function findPincodeInRow(row){
+    const keys = Object.keys(row);
+
+    // Pehle proper pincode column ko priority do
+    const pinKey = keys.find(k => {
+        const n = String(k)
+            .toLowerCase()
+            .replace(/[_\-]+/g," ")
+            .replace(/\s+/g," ")
+            .trim();
+
+        return [
+            "pincode",
+            "pin code",
+            "pin",
+            "postal code",
+            "postalcode",
+            "pin_code"
+        ].includes(n);
+    });
+
+    if(pinKey){
+        const pin = normalizePincodeValue(row[pinKey]);
+        if(pin) return pin;
+    }
+
+    // Different bank sheets me column alag ho sakta hai.
+    // Isliye row ke kisi bhi cell me 6-digit pincode dhundo.
+    for(const key of keys){
+        const pin = normalizePincodeValue(row[key]);
+        if(pin) return pin;
+    }
+
+    return "";
+}
+
+function restoreCompanyTableHeader(){
+    const thead = document.querySelector("#resultTable thead");
+    if(thead){
+        thead.innerHTML = `
+        <tr>
+            <th>Company</th>
+            <th>Bank</th>
+            <th>Category</th>
+        </tr>`;
+    }
+}
+
+function showPincodeTableHeader(){
+    const thead = document.querySelector("#resultTable thead");
+    if(thead){
+        thead.innerHTML = `
+        <tr>
+            <th>Bank</th>
+            <th>Pincode</th>
+            <th>Details</th>
+        </tr>`;
+    }
+}
+
+/* ===========================
+   PINCODE EXCEL UPLOAD
+=========================== */
 
 document.getElementById("pincodeFile").addEventListener("change", async function(e){
 
     const file = e.target.files[0];
-
     if(!file) return;
 
-    await loadPincodeExcel(file);
-	await savePincodeToDB(file);
+    try{
+        await loadPincodeExcel(file);
+        await savePincodeToDB(file);
+        pincodeLoaded = true;
 
-    pincodeLoaded = true;
-
-    alert("Pincode Excel Loaded Successfully");
-
+        alert("Pincode Excel Loaded Successfully");
+    }catch(err){
+        console.error(err);
+        pincodeLoaded = false;
+        alert("Pincode Excel Load Failed");
+    }
 });
 
+/* ===========================
+   LOAD PINCODE EXCEL
+=========================== */
 
 async function loadPincodeExcel(file){
 
     return new Promise((resolve,reject)=>{
 
         const reader = new FileReader();
-		
-		reader.onprogress = function(e){
-    if(e.lengthComputable){
-        let percent = Math.round((e.loaded / e.total) * 100);
-        progressBar.style.width = percent + "%";
-        progressText.innerText = "Reading Pincode Excel " + percent + "%";
-    }
-};
+
+        reader.onprogress = function(e){
+            if(e.lengthComputable){
+                const percent = Math.round((e.loaded / e.total) * 100);
+                if(typeof progressBar !== "undefined") progressBar.style.width = percent + "%";
+                if(typeof progressText !== "undefined") progressText.innerText =
+                    "Reading Pincode Excel " + percent + "%";
+            }
+        };
 
         reader.onload = function(event){
-
             try{
 
                 const workbook = XLSX.read(
                     new Uint8Array(event.target.result),
-                    {type:"array"}
+                    {type:"array", cellDates:false}
                 );
 
                 pincodeData = [];
                 pincodeMap.clear();
 
-                workbook.SheetNames.forEach(sheetName=>{
+                // Har sheet automatically bank hai.
+                pincodeBanks = workbook.SheetNames.map(name => String(name).trim());
+
+                workbook.SheetNames.forEach(sheetName => {
 
                     const sheet = workbook.Sheets[sheetName];
 
-                    const json = XLSX.utils.sheet_to_json(sheet);
+                    // raw:false se formatted Excel values bhi preserve karne ki koshish hoti hai
+                    const json = XLSX.utils.sheet_to_json(sheet, {
+                        defval: "",
+                        raw: false
+                    });
 
-                    json.forEach(row=>{
+                    json.forEach(row => {
 
-                        const pin =
-                        String(
-                        row["Pincode"] ??
-                        row["PINCODE"] ??
-                        row["Name"] ??
-                        ""
-                        ).trim();
+                        const pin = findPincodeInRow(row);
+                        if(!pin) return;
 
-                        if(pin==="") return;
-
-                        const item={
-
-                            pincode:pin,
-
-                            city:String(
-                            row["City"] ??
-                            row["City__c"] ??
-                            ""
-                            ),
-
-                            state:String(
-                            row["State"] ??
-                            row["State__c"] ??
-                            ""
-                            ),
-
-                            branch:String(
-                            row["Branch"] ??
-                            row["set Branch Pinco"] ??
-                            ""
-                            ),
-
-                            distance:String(
-                            row["Distance"] ??
-                            ""
-                            ),
-
-                            bank:sheetName
-
+                        const item = {
+                            pincode: pin,
+                            city: String(row["City"] ?? row["City__c"] ?? "").trim(),
+                            state: String(row["State"] ?? row["State__c"] ?? "").trim(),
+                            branch: String(row["Branch"] ?? row["set Branch Pinco"] ?? "").trim(),
+                            distance: String(row["Distance"] ?? "").trim(),
+                            bank: String(sheetName).trim()
                         };
 
                         pincodeData.push(item);
 
-                        pincodeMap.set(pin,item);
+                        // Same pincode multiple banks me ho sakta hai.
+                        if(!pincodeMap.has(pin)){
+                            pincodeMap.set(pin, []);
+                        }
 
+                        pincodeMap.get(pin).push(item);
                     });
-
                 });
 
-                console.log(
-                    "Loaded",
-                    pincodeData.length,
-                    "Pincodes"
-                );
-				
-				progressBar.style.width = "100%";
-progressText.innerText = "Pincode Excel Loaded";
+                console.log("Pincode sheets/banks:", pincodeBanks);
+                console.log("Total pincode rows:", pincodeData.length);
+
+                if(typeof progressBar !== "undefined") progressBar.style.width = "100%";
+                if(typeof progressText !== "undefined") progressText.innerText = "Pincode Excel Loaded";
 
                 resolve();
 
-            }
-
-            catch(err){
-
+            }catch(err){
                 reject(err);
-
             }
+        };
 
+        reader.onerror = function(){
+            reject(new Error("Unable to read Pincode Excel"));
         };
 
         reader.readAsArrayBuffer(file);
-
     });
-
 }
-
 
 /* ===========================
    PINCODE SEARCH + SUGGESTIONS
@@ -4304,16 +4359,10 @@ const oldSearch = document.getElementById("searchInput");
 oldSearch.addEventListener("input", function(){
 
     const value = this.value.trim();
-	
-	// Agar text hai to pincode search mat chalao
-if (!/^\d+$/.test(value)) {
-    return;
-}
 
-    if(!pincodeLoaded) return;
-
-    // Sirf number par pincode search
+    // Sirf numeric search pincode ke liye
     if(!/^\d+$/.test(value)) return;
+    if(!pincodeLoaded) return;
 
     suggestions.innerHTML = "";
 
@@ -4321,106 +4370,130 @@ if (!/^\d+$/.test(value)) {
 
     let html = "";
     let count = 0;
+    const seen = new Set();
 
-    for(let item of pincodeData){
+    for(const item of pincodeData){
 
-        if(item.pincode.startsWith(value)){
+        if(item.pincode.startsWith(value) && !seen.has(item.pincode)){
+
+            seen.add(item.pincode);
 
             html += `
-            <div class="suggestion-item pin-item"
-                 data-pin="${item.pincode}">
-                ${item.pincode} - ${item.city}
+            <div class="suggestion-item pin-item" data-pin="${item.pincode}">
+                ${item.pincode} - ${item.city || item.bank}
             </div>`;
 
             count++;
-
-            if(count>=10) break;
+            if(count >= 10) break;
         }
-
     }
 
-    if(count==0){
-
-        suggestions.innerHTML=`
-        <div class="suggestion-item">
-        No Pincode Found
-        </div>`;
-
+    if(count === 0){
+        suggestions.innerHTML = `
+        <div class="suggestion-item">No Pincode Found</div>`;
         return;
     }
 
     suggestions.innerHTML = html;
-
 });
-
 
 /* ===========================
-   PINCODE CLICK
+   PINCODE CLICK / RESULT
 =========================== */
 
-document.addEventListener("click",function(e){
+document.addEventListener("click", function(e){
 
-    let item=e.target.closest(".pin-item");
-
+    const item = e.target.closest(".pin-item");
     if(!item) return;
 
-    let pin=item.dataset.pin;
+    const pin = item.dataset.pin;
+    const data = pincodeMap.get(pin) || [];
 
-    let data=pincodeMap.get(pin);
+    if(!data.length) return;
 
-    if(!data) return;
+    document.getElementById("searchInput").value = pin;
+    suggestions.innerHTML = "";
 
-    document.getElementById("searchInput").value=pin;
+    showPincodeTableHeader();
 
-    suggestions.innerHTML="";
+    // Saare banks dikhao: jo sheet me hai = FOUND, jo nahi hai = NOT FOUND
+    const banks = pincodeBanks.length
+        ? pincodeBanks
+        : [...new Set(pincodeData.map(x => x.bank))];
 
-    document.getElementById("resultBody").innerHTML=`
+    const foundByBank = new Map();
+    data.forEach(row => {
+        if(!foundByBank.has(row.bank)) foundByBank.set(row.bank, row);
+    });
 
-<tr>
+    let html = "";
+    let foundCount = 0;
+    lastResult = [];
 
-<td>${data.bank}</td>
+    banks.forEach(bank => {
 
-<td>${data.pincode}</td>
+        const match = foundByBank.get(bank);
 
-<td>
+        if(match){
+            foundCount++;
+            lastResult.push(match);
 
-${data.city}<br>
+            html += `
+            <tr>
+                <td>${match.bank}</td>
+                <td>${match.pincode}</td>
+                <td>
+                    ${match.city || ""}<br>
+                    ${match.state || ""}<br>
+                    ${match.branch ? "Branch : " + match.branch + "<br>" : ""}
+                    ${match.distance ? "Distance : " + match.distance : "FOUND"}
+                </td>
+            </tr>`;
+        }
+        // Agar pincode is bank ki sheet me nahi hai,
+        // to bank ko table me bilkul show nahi karna hai.
+        // Sirf FOUND banks hi table me aayenge.
+    });
 
-${data.state}<br>
+    document.getElementById("resultBody").innerHTML = html;
+    document.getElementById("resultCount").innerText =
+        foundCount === 1
+            ? "Pincode Found"
+            : `Pincode Found in ${foundCount} Banks`;
+    document.getElementById("resultTable").style.display = "table";
+    document.getElementById("downloadBtn").style.display = "inline-block";
 
-Branch : ${data.branch}<br>
-
-Distance : ${data.distance}
-
-</td>
-
-</tr>
-
-`;
-
-    document.getElementById("resultTable").style.display="table";
-
-    document.getElementById("resultCount").innerText="Pincode Found";
-
-    document.getElementById("downloadBtn").style.display="inline-block";
-	document.getElementById("tableArea").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+    document.getElementById("tableArea").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 });
 
-});
+/* ===========================
+   CLOCK = PINCODE EXCEL CHECK
+=========================== */
 
+document.getElementById("analogClock").addEventListener("click", async function(){
 
-
-
-document.getElementById("analogClock").addEventListener("click",function(){
-
+    // Flag false ho sakta hai page reload ke baad, isliye DB bhi check karo.
     if(!pincodeLoaded){
+        try{
+            const existingFile = await getPincodeFromDB();
+
+            if(existingFile){
+                pincodeLoaded = true;
+                alert("Excel Already Uploaded");
+                return;
+            }
+        }catch(err){
+            console.error(err);
+        }
+
         document.getElementById("pincodeFile").click();
-    }else{
-        alert("Pincode Excel Already Loaded");
+        return;
     }
 
+    alert("Excel Already Uploaded");
 });
 
 function updateClock(){
