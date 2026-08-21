@@ -2072,6 +2072,15 @@ filter:drop-shadow(0 0 15px #4fc3ff);
     border-radius:50%;
 }
 
+	td.not-found,
+td:nth-child(3).not-found {
+    color: red !important;
+    -webkit-text-fill-color: red !important;
+    font-weight: 800 !important;
+    background: transparent !important;
+    text-shadow: none !important;
+}
+
 </style>
 </head>
 
@@ -4451,15 +4460,15 @@ banks.forEach(bank => {
             </td>
         </tr>`;
 
-    }else{
+     }else{
 
-        html += `
-        <tr>
-            <td>${bank}</td>
-            <td>NOT FOUND</td>
-            <td>Branch : NOT FOUND</td>
-        </tr>`;
-    }
+    html += `
+    <tr>
+        <td>${bank}</td>
+        <td class="not-found">NOT FOUND</td>
+        <td class="not-found">Branch : NOT FOUND</td>
+    </tr>`;
+}
 });
 
     document.getElementById("resultBody").innerHTML = html;
