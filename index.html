@@ -3251,6 +3251,8 @@ suggestions.addEventListener("click", function(e){
     let key = normalizeCompanyName(company);
 
     let data = companyMap.get(key) || [];
+	
+    restoreCompanyTableHeader();
 
     let banks = [...new Set(allData.map(x => x.bank))];
 
